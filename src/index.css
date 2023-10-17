@@ -1,0 +1,15 @@
+:root {
+  font-family: sans-serif, Inter, system-ui, Avenir, Helvetica, Arial;
+  line-height: 1.4;
+  /* font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%; */
+}
+body{
+  width: 100%; margin: 0;
+}
+
+

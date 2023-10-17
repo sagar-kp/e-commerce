@@ -1,0 +1,22 @@
+.categories__section{
+  position: relative; margin-top: -345px; padding-left: 20px;
+  background: linear-gradient(180deg, transparent, rgba(227, 230, 230, 0.9), rgba(227, 230, 230, 0.9), rgb(227, 230, 230));
+}
+
+.categories__card{
+  background-color: white; margin-right: 20px; margin-bottom: 20px;
+  padding: 15px; position: relative;
+}
+.categories__card img{
+  cursor: pointer;
+  /* aspect-ratio: 4/2.8; */
+}
+.categories__name{
+  font-size: small; margin: -5px 0px 25px;
+  color: rgb(112, 112, 112); cursor: pointer;
+}
+
+.categories__see-more{
+  color: rgb(43, 137, 154); position: absolute;
+  font-size: small; bottom: 15px; cursor: pointer;
+}
