@@ -3,22 +3,39 @@
 .options{
   font-size: 14px; margin-top: -11px; cursor: pointer;
 }
-.options:hover, .search__productname:hover, .search__rating-count:hover{
+.options:hover, .search__productname:hover, .search__review-icon:hover,
+.search__rating-count:hover{
   color: rgb(218, 90, 5) !important; 
 }
 .title{
   font-size: 14px; font-weight: bold;
 }
 
-/* SearchCard */
+.search__review-icon{
+  font-size:14px; cursor:pointer; 
+}
 
+/* SearchCard */
 
 .search__rating-count{
   color:#004e93;
   font-size:15px; margin-left:5px;
 }
+.search__productname{
+  cursor: pointer;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  display: -webkit-box; 
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-
+.search__card-container{
+  display: flex; border:0.01px solid lightgrey; margin:5px 5px 0 0; border-radius:5px; overflow:hidden;
+}
+.search__card-container img{
+  width: 100%;
+}
 /* Price Component */
 
 .price__input{
@@ -34,6 +51,3 @@
   background-color: rgba(211, 211, 211, 0.171);
 }
 
-
-
-/* Categories */

@@ -12,4 +12,11 @@ body{
   width: 100%; margin: 0;
 }
 
+.overflow-manager{
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  display: -webkit-box; 
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 

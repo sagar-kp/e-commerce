@@ -1,37 +1,63 @@
 import { useEffect, useState } from "react"
-import { useSearchParams } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { getData } from "../utils/apiCalls"
 import "./styles/search.css"
+import { useFilterResults, useHandleImage } from "../utils/custom hooks"
+import { addDoc, collection } from "firebase/firestore"
+import { db } from "../utils/firebaseConfig"
 
+const env = import.meta.env
 const priceArr = [0, 1000, 5000, 10000, 20000, 20000]
 
-const SearchCard = ({obj})=>
-<div style={{display: "flex", border:"0.01px solid lightgrey", margin:"5px 5px 0 0", borderRadius:"5px", overflow:"hidden"
-  }}
+const LeftIcon = ()=> <svg style={{transform:"rotate(180deg)", pointerEvents:"none",}} 
+  fill="#000000" height="11px" width="11px" version="1.1" id="Layer_1" 
+  xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" 
+  viewBox="0 0 330 330" xmlSpace="preserve"
 >
-  <img src={obj.img_link}
-    style={{width:"25%"}}
-  />
-  <div style={{paddingLeft:"10px"}}>
-    <p className="search__productname">{obj.product_name}</p>
-    <p className="search__rating">
-      <span>
-        {[1, 2, 3, 4, 5].map(num=>
-          <i key={num} style={{color:"orange", fontSize:"16px"}} 
-            className={`bi ${num<obj.rating?"bi-star-fill":(num>obj.rating&&Math.ceil(obj.rating)===num&&obj.rating*10%10>=4)?'bi-star-half':'bi-star'} `}
-          >
-          </i>
-        )}
-      </span>
-      <span className="search__rating-count" style={{color:"#004e93", fontSize:"15px", marginLeft:"5px"}}>{obj.rating_count}</span>
-    </p>
-    <p style={{marginTop: "-15px"}}>
-      <span style={{fontSize:"28px"}}>{obj.discounted_price}</span>
-      <span style={{fontSize:"14px", paddingLeft:"8px"}}>M.R.P: <span style={{textDecorationLine:"line-through"}}>{obj.actual_price}</span></span>
-      <span style={{marginLeft:"8px"}}>({obj.discount_percentage} off)</span>
-    </p>
+  <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+  <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+  <g id="SVGRepo_iconCarrier"> 
+    <path id="XMLID_222_" 
+      d="M250.606,154.389l-150-149.996c-5.857-5.858-15.355-5.858-21.213,0.001 c-5.857,5.858-5.857,15.355,0.001,21.213l139.393,139.39L79.393,304.394c-5.857,5.858-5.857,15.355,0.001,21.213 C82.322,328.536,86.161,330,90,330s7.678-1.464,10.607-4.394l149.999-150.004c2.814-2.813,4.394-6.628,4.394-10.606 C255,161.018,253.42,157.202,250.606,154.389z"
+    >
+    </path> 
+  </g>
+</svg>
+
+const SearchCard = ({obj})=>{
+  const navigate = useNavigate()
+
+  const imgSrc = useHandleImage(obj.img_link)
+
+  return <div className="search__card-container">
+    <div style={{flex:"25%"}}>
+      <img src={imgSrc} alt="product_image"/>
+    </div>
+    <div style={{paddingLeft:"10px", flex:"75%"}}>
+      <p className="search__productname" 
+        onClick={()=>navigate(`/p?name=${obj.product_name}`)}
+      >
+        {obj.product_name}
+      </p>
+      <p className="search__rating">
+        <span>
+          {[1, 2, 3, 4, 5].map(num=>
+            <i key={num} style={{color:"orange", fontSize:"16px"}} 
+              className={`bi ${num<obj.rating?"bi-star-fill":(num>obj.rating&&Math.ceil(obj.rating)===num&&obj.rating*10%10>=4)?'bi-star-half':'bi-star'} `}
+            >
+            </i>
+          )}
+        </span>
+        <span className="search__rating-count" style={{color:"#004e93", fontSize:"15px", marginLeft:"5px"}}>{obj.rating_count}</span>
+      </p>
+      <p style={{marginTop: "-15px"}}>
+        <span style={{fontSize:"28px"}}>{obj.discounted_price}</span>
+        <span style={{fontSize:"14px", paddingLeft:"8px"}}>M.R.P: <span style={{textDecorationLine:"line-through"}}>{obj.actual_price}</span></span>
+        <span style={{marginLeft:"8px"}}>({obj.discount_percentage} off)</span>
+      </p>
+    </div>
   </div>
-</div>
+}
 
 const PriceComp = ({ selected, setSelected})=>{
   const [inputPrice, setInputPrice] = useState({min:-1, max:-1})
@@ -45,7 +71,7 @@ const PriceComp = ({ selected, setSelected})=>{
           setInputPrice(prev=>({...prev, min: -1, max: -1}))
         }}
       >
-        {"< "}Any Price
+        <LeftIcon/>Any Price
       </p>
     }
     {priceArr.slice(1).map((price, index)=>
@@ -91,60 +117,54 @@ const PriceComp = ({ selected, setSelected})=>{
 export default function Search(){
   const [searchParams] = useSearchParams()
   const [searchResults, setSearchResults] = useState([])
+  const [noResult, setNoResult] = useState(false)
   const [displayData, setDisplayData] = useState([])
   const [categories, setCategories] = useState([])
-  const [selected, setSelected] = useState({category:"", price:{min:-1, max:-1}, rating:""})
-  console.log(searchResults.length, searchResults)
-  console.log(displayData, selected)
-  
-  useEffect(()=>{
-    let tempDisplayArr = [...searchResults]
-    const filterByPrice=(min, max)=>{
-      if (typeof min==="number" && typeof max==="number" && max>=0 && min>=0 ){    
-        tempDisplayArr = tempDisplayArr.filter(obj=>{
-          let price = parseFloat(obj.discounted_price.split('₹')[1])
-          return price>=min && price<max
-        })
-      }
-    }
-  
-    const filterByRating=(min)=>{
-      if (typeof min==="number"){
-        tempDisplayArr = tempDisplayArr.filter(obj=> obj.rating>min)
-      }
-
-    }
-  
-    const filterByCategory=(category)=>{
-      console.log(category)
-      if (category.length>0){ 
-        tempDisplayArr = tempDisplayArr.filter(obj=>obj.category.includes(category)) 
-      }
-    }
-    // console.log("selected triggered")
-    
-    if (selected.category.length!==0||selected.rating.length!==0||(selected.price.min!==-1 && selected.price.max!==-1)){
-      if (selected.category.length!==0) filterByCategory(selected.category)
-      if (selected.rating.length!==0) filterByRating(selected.rating)
-      if (selected.price.min!==-1 && selected.price.max!==-1) filterByPrice(selected.price.min, selected.price.max)
-      setDisplayData(tempDisplayArr)
-    } else setDisplayData([...searchParams])
-  },[selected])
+  const [selected, setSelected] = useFilterResults(searchResults, setDisplayData) 
+  const categoriesQuery = searchParams.get("hidden-keywords")
+  const query = searchParams.get('k') 
+  // console.log(searchResults, noResult)
   // set search results based on query strings
   useEffect(()=>{
-    const categoriesQuery = searchParams.get("hidden-keywords")
-    const query = searchParams.get('k')
-    console.log(categoriesQuery)
-    getData(`products/search?category=${categoriesQuery}&product_name=${categoriesQuery}`)
-    .then(res=>{
-      console.log(res)
-      setSearchResults(prevArr=>[...prevArr].concat(res.data))
-      
-    })
-    .catch(err=>{
-      console.log(err)
-    })
-  },[])
+    
+    setNoResult(false)
+    setSearchResults(()=>[])
+    // console.log(categoriesQuery)
+    if (categoriesQuery)
+      getData(`products/search?category=${categoriesQuery}&product_name=${categoriesQuery}`)
+      .then(resp=>{
+        // console.log(resp)
+        if (resp.data.length>0){
+          setSearchResults(prevArr=>[...prevArr, ...resp.data])
+          
+        }
+        else if(searchResults.length===0) setNoResult(true)
+      })
+      .catch(err=> {
+        if(env.MODE==="production"){
+          addDoc(collection(db, "errors"),{
+            [Date()]:{...err, moreDetails:`File:search Line:146 function:getData categriesQuery:${categoriesQuery}`}
+          })
+        } else console.log(err)
+      })
+    if (query)
+      getData(`products/search?category=${query}&product_name=${query}`)
+      .then(resp=>{
+        // console.log(resp)
+        if (resp.data.length>0){
+          setSearchResults(prevArr=>[...prevArr, ...resp.data])
+          
+        }
+        else if(searchResults.length===0) setNoResult(true)
+      })
+      .catch(err=> {
+        if(env.MODE==="production"){
+          addDoc(collection(db, "errors"),{
+            [Date()]:{...err, moreDetails:`File:search Line:163 function:getData query${query}`}
+          })
+        } else console.log(err)
+      })
+  },[query, categoriesQuery])
 
   // set categories
   useEffect(()=>{
@@ -154,16 +174,26 @@ export default function Search(){
       searchResults.forEach(obj=>obj.category.split("|").forEach(category=>tempSet.add(category)))
       // console.log(tempSet)
       setCategories([...tempSet])
-    }
+    } else if (searchResults.length===0) setCategories(()=>[])
   },[searchResults])
-  return <section style={{display:"flex"}}>
+  return noResult?
+  <div style={{padding:"30px 20% 0px"}}>
+    No results for {categoriesQuery?categoriesQuery.replaceAll(" | ", " or "):query.replaceAll(" | ", " or ")}<br/>
+    <span style={{fontSize:"small"}}>Try checking your spelling or use more general terms</span>
+  </div>
+  :<div style={{display:"flex"}}>
     <div style={{flex:"20%", paddingLeft:"10px"}}>
       
       {searchResults.length>0&&<>
         <p className="title">Customer Review</p>
-        {/* Implement clear with text All Reviews */}
+        {selected.rating!==-1&&<p className="options" style={{ margin:"-7px 0px 0px"}} 
+          onClick={()=>setSelected(prev=>({...prev, rating:-1}))}
+        >
+          <LeftIcon/>{` Clear`}
+        </p>}
         {[4, 3, 2, 1].map(no=>
-          <div key={no} style={{fontSize:"14px", fontWeight: selected.rating===no&&"bold"}} 
+          <div key={no} className="search__review-icon"
+            style={{ fontWeight: selected.rating===no&&"bold"}} 
             onClick={()=>setSelected(prev=>({...prev, rating:no}))}
           >
             {[1, 2, 3, 4, 5].map(num=>
@@ -176,6 +206,13 @@ export default function Search(){
         <PriceComp selected={selected} setSelected={setSelected}/>
       }
       {categories.length>0&& <p className="title">Category</p>}
+      {selected.category.length!==0&&
+        <p className="options" 
+          onClick={()=>setSelected(prev=>({...prev, category:""}))}
+        >
+          <LeftIcon/>{` All Categories`}
+        </p>
+      }
       {categories.map((obj)=>
         <p className="options" key={obj}
           style={{fontWeight: obj===selected.category&&"bold"}}
@@ -189,5 +226,5 @@ export default function Search(){
       {searchResults.length>0&&<h3>Results</h3>}
       {displayData.map((obj, index)=><SearchCard key={index} obj={obj}/>)}
     </div>
-  </section>
+  </div>
 }

@@ -1,0 +1,81 @@
+/* .cart__checkout */
+.cart__checkout{
+  margin:10%; text-align:center;
+}
+.cart__checkout div{
+  font-size:x-large; font-weight:bold; margin-bottom:10px;
+}
+.cart__checkout a{
+  text-decoration: none;
+}
+
+
+/* .cart__signedin-empty */
+.cart__signedin-empty{
+  padding: 20px;
+}
+.cart__signedin-empty span{font-size: xx-large;}
+.cart__signedin-empty a{
+  text-decoration-line:none ; color:rgb(43, 137, 154);
+}
+
+
+/* .cart__empty */
+.cart__empty{
+  display:flex; padding:5% 3% 3%;
+}
+.cart__empty img{width: 100%;}
+
+
+.cart__signinup{
+  padding:4px 6.5px; border-radius:4px; cursor: pointer;  cursor:pointer; font-size:15px;
+}
+.cart__signin{
+  background-color:rgb(255, 216, 20); border:1px solid rgb(255, 216, 20);
+}
+.cart__signup{
+  margin-left:7px; background-color:white; border:1px solid gray;
+}
+
+
+.cart__deals{
+  font-size:small; color:#004e93; cursor:pointer;
+}
+
+
+.cart__buy{
+  cursor:pointer; width:100%; padding:9px; border:none; border-radius:15px; 
+    background:rgb(255, 216, 20); margin-top:20px; 
+}
+
+
+.cart__purchase{
+  flex:20%; margin:25px 15px 25px 0px; padding:15px;
+}
+
+.cart__container{
+  display:flex; border-top:1px solid lightgrey; padding:5px 15% 0% 3%; margin:0% 2%;
+}
+.cart__container img{ width: 100%;}
+.cart__container select{
+  background:rgb(235, 236, 238); border:none; outline:none;    
+}
+
+
+.cart__select-div{
+  background:rgb(235, 236, 238); padding:5px; border-radius:5px; 
+  border:1px solid lightgrey; box-shadow:0px 2px 5px rgb(0, 0, 0, 0.2);
+}
+
+.cart__modify{
+  display:flex; align-items:baseline; font-size:small;
+}
+
+.cart__heading{
+  font-size:25px; margin:15px 0px 0px 2%;
+}
+
+
+.cart__main{
+  flex:75%; margin:25px 15px; background:white;
+}

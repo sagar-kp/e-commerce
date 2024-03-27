@@ -1,0 +1,45 @@
+form{
+  border:1px solid lightgray ;border-radius:5px; text-align:left; padding:0% 5% 5%;   
+}
+form button{
+  width:100%; margin:15px 0px; padding:6.5px; border-radius:7.5px; border:none; 
+  cursor:pointer; background-color:rgb(255, 216, 20);
+}
+form span {
+  color:red; font-size:11px;
+}
+form label{
+  font-size:small; font-weight:bold;
+}
+form input{
+  width:97%; height:25px;
+}
+form p{
+  font-size:xx-large; margin:10px 0px;
+}
+
+
+
+.signinup__create-account{
+  font-size:small; margin:15px 5px 5px;
+}
+.signinup__create-account hr{
+  border:1px solid lightgray; margin-bottom:-7px;
+}
+.signinup__create-account span{
+  background-color:white; padding:5px; color:grey;
+}
+.signinup__create-account button{
+  width:100%; margin:5px 0px; padding:5px; border-radius:5px;background-color:transparent; 
+  border:1px solid lightgray; cursor:pointer;
+}
+
+.signinup__container{
+  display:flex; justify-content:center;
+}
+.signinup__container section{
+  width:25%; text-align:center;
+}
+.signinup__container section img{
+  width:45%
+}

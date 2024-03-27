@@ -1,8 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Home from './components/Home'
-import Navbar from './components/Navbar'
-import Search from './components/Search'
-// import {data} from "./utils/apiCalls";
+import { Home, Product, Navbar, Search, Cart, SignInUp, Orders } from './components'
 
 function App() {
   return ( 
@@ -11,7 +8,11 @@ function App() {
       <Routes>
         <Route path='/' element={<Home/>} />
         <Route path='/s' element={<Search/>} />
-        <Route path='/p' element={<Home/>} />
+        <Route path='/p' element={<Product/>} />
+        <Route path='/cart' element={<Cart/>} />
+        <Route path='/signin' element={<SignInUp/>} />
+        <Route path='/signup' element={<SignInUp/>} />
+        <Route path='/orders' element={<Orders/>} />
       </Routes>
     </BrowserRouter>
   )

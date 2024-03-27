@@ -1,0 +1,27 @@
+.orders__no-orders{
+  margin:10%; text-align:center; font-weight:bold; font-size:large;
+}
+.orders__no-orders a{
+  text-decoration-line: none; font-size: small; color: rgb(43, 137, 154);
+}
+
+.orders__container{
+  border:1px solid lightgray; border-radius:10px; margin-bottom:10px;
+}
+
+.orders__date-total{ 
+  display:flex; font-size:small; background-color:rgb(240, 242, 242); padding:10px 10px 10px 20px;
+  border-top-left-radius:10px; border-top-right-radius:10px; justify-content:flex-start; 
+  border-bottom:1px solid lightgray;
+}
+
+
+.orders__delivery-date{
+  font-size:large; font-weight:bold; padding:10px 10px 10px 20px;
+}
+
+
+.orders__quantity{
+  position:absolute; z-index:1; background-color:white; border-radius:50%; 
+  border:1px solid lightgray; padding:2px 8px; margin:45px 0px 0px 70px; font-size:small;
+}

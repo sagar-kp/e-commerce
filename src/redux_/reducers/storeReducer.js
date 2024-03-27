@@ -1,6 +1,9 @@
 const initialState = {
   carouselData:[],
-  categoriesData: []
+  categoriesData: [],
+  historyData : "",
+  userPurchase:{}, 
+  isSignUp: false
 }
 
 export const storeReducer = (state=initialState, action)=>{
