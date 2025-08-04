@@ -3,12 +3,14 @@ import { storeReducer } from "./redux_/reducers/storeReducer";
 import { cartReducer } from "./redux_/reducers/cartReducer";
 
 const store = configureStore({
-  reducer:{
-    storeReducer, cartReducer
+  reducer: {
+    storeReducer,
+    cartReducer,
   },
-  middleware: getDefaultMiddleware => getDefaultMiddleware({
-    serializableCheck:false
-  }),
-})
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
+});
 
-export default store
+export default store;
