@@ -8,15 +8,15 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%; */
 }
-body{
-  width: 100%; margin: 0;
+body {
+  width: 100%;
+  margin: 0;
 }
 
-.overflow-manager{
+.overflow-manager {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  display: -webkit-box; 
+  display: -webkit-box;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-

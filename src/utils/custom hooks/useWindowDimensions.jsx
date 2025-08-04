@@ -3,15 +3,18 @@ import { useState, useEffect } from "react";
 export default function useWindowDimensions() {
   // Initialize state with undefined width/height so server and client renders match
   // Learn more here: https://joshwcomeau.com/react/the-perils-of-rehydration/
-  const [windowDimensions, setWindowDimensions] = useState(
-    {windowWidth:window.innerWidth, windowHeight:window.innerHeight},
-  );
+  const [windowDimensions, setWindowDimensions] = useState({
+    windowWidth: window.innerWidth,
+    windowHeight: window.innerHeight,
+  });
   useEffect(() => {
     // Handler to call on window resize
     function handleResize() {
       // Set window width/height to state
-      setWindowDimensions(prev=>({ ...prev,
-        windowWidth:window.innerWidth, windowHeight:window.innerHeight
+      setWindowDimensions((prev) => ({
+        ...prev,
+        windowWidth: window.innerWidth,
+        windowHeight: window.innerHeight,
       }));
     }
     // Add event listener
