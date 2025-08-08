@@ -40,7 +40,7 @@ const LeftIcon = () => (
 const SearchCard = ({ obj }) => {
   const navigate = useNavigate();
 
-  const imgSrc = useHandleImage(obj.img_link);
+  const imgSrc = useHandleImage(obj?.img_link);
 
   return (
     <div className="search__card-container">
@@ -50,9 +50,9 @@ const SearchCard = ({ obj }) => {
       <div style={{ paddingLeft: "10px", flex: "75%" }}>
         <p
           className="search__productname"
-          onClick={() => navigate(`/p?name=${obj.product_name}`)}
+          onClick={() => navigate(`/p?name=${obj?.product_name}`)}
         >
-          {obj.product_name}
+          {obj?.product_name}
         </p>
         <p className="search__rating">
           <span>
@@ -61,11 +61,11 @@ const SearchCard = ({ obj }) => {
                 key={num}
                 style={{ color: "orange", fontSize: "16px" }}
                 className={`bi ${
-                  num < obj.rating
+                  num < obj?.rating
                     ? "bi-star-fill"
-                    : num > obj.rating &&
-                      Math.ceil(obj.rating) === num &&
-                      (obj.rating * 10) % 10 >= 4
+                    : num > obj?.rating &&
+                      Math.ceil(obj?.rating) === num &&
+                      (obj?.rating * 10) % 10 >= 4
                     ? "bi-star-half"
                     : "bi-star"
                 } `}
@@ -76,19 +76,19 @@ const SearchCard = ({ obj }) => {
             className="search__rating-count"
             style={{ color: "#004e93", fontSize: "15px", marginLeft: "5px" }}
           >
-            {obj.rating_count}
+            {obj?.rating_count}
           </span>
         </p>
         <p style={{ marginTop: "-15px" }}>
-          <span style={{ fontSize: "28px" }}>{obj.discounted_price}</span>
+          <span style={{ fontSize: "28px" }}>{obj?.discounted_price}</span>
           <span style={{ fontSize: "14px", paddingLeft: "8px" }}>
             M.R.P:{" "}
             <span style={{ textDecorationLine: "line-through" }}>
-              {obj.actual_price}
+              {obj?.actual_price}
             </span>
           </span>
           <span style={{ marginLeft: "8px" }}>
-            ({obj.discount_percentage} off)
+            ({obj?.discount_percentage} off)
           </span>
         </p>
       </div>
@@ -102,7 +102,7 @@ const PriceComp = ({ selected, setSelected }) => {
   return (
     <>
       <p className="title">Price</p>
-      {selected.price.min !== -1 && selected.price.max !== -1 && (
+      {selected?.price?.min !== -1 && selected?.price?.max !== -1 && (
         <p
           className="options"
           onClick={() => {
@@ -114,12 +114,12 @@ const PriceComp = ({ selected, setSelected }) => {
           Any Price
         </p>
       )}
-      {priceArr.slice(1).map((price, index) => (
+      {priceArr?.slice(1)?.map((price, index) => (
         <p
           className="options"
           key={index}
           style={{
-            fontWeight: priceArr[index] === selected.price.min && "bold",
+            fontWeight: priceArr[index] === selected?.price?.min && "bold",
           }}
           onClick={() => {
             setInputPrice((prev) => ({ ...prev, min: -1, max: -1 }));
@@ -136,36 +136,36 @@ const PriceComp = ({ selected, setSelected }) => {
           ${
             index === 0
               ? "Under"
-              : index === priceArr.length - 2
+              : index === priceArr?.length - 2
               ? "Over"
-              : `₹${priceArr[index].toLocaleString()} -`
+              : `₹${priceArr?.[index]?.toLocaleString()} -`
           } 
-          ₹${price.toLocaleString()}
+          ₹${price?.toLocaleString()}
         `}
         </p>
       ))}
       <div style={{ display: "flex" }}>
         <input
           className="price__input"
-          value={inputPrice.min >= 0 && inputPrice.min}
+          value={inputPrice?.min >= 0 && inputPrice?.min}
           placeholder="Min"
           type="number"
           onChange={(e) =>
             setInputPrice((prevPrice) => ({
               ...prevPrice,
-              min: parseFloat(e.target.value),
+              min: parseFloat(e?.target?.value),
             }))
           }
         />
         <input
           className="price__input"
-          value={inputPrice.max >= 0 && inputPrice.max}
+          value={inputPrice?.max >= 0 && inputPrice?.max}
           placeholder="Max"
           type="number"
           onChange={(e) =>
             setInputPrice((prevPrice) => ({
               ...prevPrice,
-              max: parseFloat(e.target.value),
+              max: parseFloat(e?.target?.value),
             }))
           }
           style={{ marginLeft: "3px" }}
@@ -211,12 +211,12 @@ export default function Search() {
       )
         .then((resp) => {
           // console.log(resp)
-          if (resp.data.length > 0) {
-            setSearchResults((prevArr) => [...prevArr, ...resp.data]);
+          if (resp?.data?.length > 0) {
+            setSearchResults((prevArr) => [...prevArr, ...resp?.data]);
           } else if (searchResults.length === 0) setNoResult(true);
         })
         .catch((err) => {
-          if (env.MODE === "production") {
+          if (env?.MODE === "production") {
             addDoc(collection(db, "errors"), {
               [Date()]: {
                 ...err,
@@ -228,17 +228,16 @@ export default function Search() {
     if (query)
       getData(`products/search?category=${query}&product_name=${query}`)
         .then((resp) => {
-          // console.log(resp)
-          if (resp.data.length > 0) {
-            setSearchResults((prevArr) => [...prevArr, ...resp.data]);
-          } else if (searchResults.length === 0) setNoResult(true);
+          if (resp?.data?.length > 0) {
+            setSearchResults((prevArr) => [...prevArr, ...resp?.data]);
+          } else if (searchResults?.length === 0) setNoResult(true);
         })
         .catch((err) => {
-          if (env.MODE === "production") {
+          if (env?.MODE === "production") {
             addDoc(collection(db, "errors"), {
               [Date()]: {
                 ...err,
-                moreDetails: `File:search Line:163 function:getData query${query}`,
+                moreDetails: `File:search function:getData query${query}`,
               },
             });
           } else console.log(err);
@@ -248,21 +247,21 @@ export default function Search() {
   // set categories
   useEffect(() => {
     setDisplayData(searchResults);
-    if (searchResults.length > 0) {
+    if (searchResults?.length > 0) {
       let tempSet = new Set();
-      searchResults.forEach((obj) =>
-        obj.category.split("|").forEach((category) => tempSet.add(category))
+      searchResults?.forEach((obj) =>
+        obj?.category?.split("|")?.forEach((category) => tempSet?.add(category))
       );
       // console.log(tempSet)
       setCategories([...tempSet]);
-    } else if (searchResults.length === 0) setCategories(() => []);
+    } else if (searchResults?.length === 0) setCategories(() => []);
   }, [searchResults]);
   return noResult ? (
     <div style={{ padding: "30px 20% 0px" }}>
       No results for{" "}
       {categoriesQuery
-        ? categoriesQuery.replaceAll(" | ", " or ")
-        : query.replaceAll(" | ", " or ")}
+        ? categoriesQuery?.replaceAll(" | ", " or ")
+        : query?.replaceAll(" | ", " or ")}
       <br />
       <span style={{ fontSize: "small" }}>
         Try checking your spelling or use more general terms
@@ -271,10 +270,10 @@ export default function Search() {
   ) : (
     <div style={{ display: "flex" }}>
       <div style={{ flex: "20%", paddingLeft: "10px" }}>
-        {searchResults.length > 0 && (
+        {searchResults?.length > 0 && (
           <>
             <p className="title">Customer Review</p>
-            {selected.rating !== -1 && (
+            {selected?.rating !== -1 && (
               <p
                 className="options"
                 style={{ margin: "-7px 0px 0px" }}
@@ -303,11 +302,11 @@ export default function Search() {
             ))}
           </>
         )}
-        {searchResults.length > 0 && (
+        {searchResults?.length > 0 && (
           <PriceComp selected={selected} setSelected={setSelected} />
         )}
-        {categories.length > 0 && <p className="title">Category</p>}
-        {selected.category.length !== 0 && (
+        {categories?.length > 0 && <p className="title">Category</p>}
+        {selected?.category?.length !== 0 && (
           <p
             className="options"
             onClick={() => setSelected((prev) => ({ ...prev, category: "" }))}
@@ -316,11 +315,11 @@ export default function Search() {
             {` All Categories`}
           </p>
         )}
-        {categories.map((obj) => (
+        {categories?.map((obj) => (
           <p
             className="options"
             key={obj}
-            style={{ fontWeight: obj === selected.category && "bold" }}
+            style={{ fontWeight: obj === selected?.category && "bold" }}
             onClick={() => setSelected((prev) => ({ ...prev, category: obj }))}
           >
             {obj}
@@ -328,8 +327,8 @@ export default function Search() {
         ))}
       </div>
       <div style={{ flex: "80%" }}>
-        {searchResults.length > 0 && <h3>Results</h3>}
-        {displayData.map((obj, index) => (
+        {searchResults?.length > 0 && <h3>Results</h3>}
+        {displayData?.map((obj, index) => (
           <SearchCard key={index} obj={obj} />
         ))}
       </div>

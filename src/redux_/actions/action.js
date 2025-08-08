@@ -1,18 +1,20 @@
+import * as actionTypes from "../actionTypes";
+
 export const STORE_DATA = (obj) => ({
-  type: "STORE_DATA",
+  type: actionTypes.STORE_DATA,
   payload: obj,
 });
 
 export const ADD_ITEM = (obj) => ({
-  type: "ADD_ITEM",
+  type: actionTypes.ADD_ITEM,
   payload: obj,
 });
 
 export const REMOVE_ITEM = (productName) => ({
-  type: "REMOVE_ITEM",
+  type: actionTypes.REMOVE_ITEM,
   payload: productName,
 });
 
 export const RESET_CART = () => ({
-  type: "RESET_CART",
+  type: actionTypes.RESET_CART,
 });

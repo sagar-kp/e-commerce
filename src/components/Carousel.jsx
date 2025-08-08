@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import "./styles/carousel.css";
 import { useNavigate } from "react-router-dom";
 import { useInitialFetch, useCarouselUtils } from "../utils/custom hooks";
@@ -45,18 +44,18 @@ export default function Carousel() {
 
         <div className="carousel__track-container">
           <ul className="carousel__track">
-            {carouselData.map((obj, index) => (
+            {carouselData?.map((obj, index) => (
               <li
                 key={index}
                 onClick={() =>
-                  navigate(`s?hidden-keywords=${obj.keywords.join("+%7C+")}`)
+                  navigate(`s?hidden-keywords=${obj?.keywords?.join("+%7C+")}`)
                 }
                 className={`carousel__slide ${
                   index === 0 ? "current-slide" : ""
                 }`}
               >
                 <img
-                  src={obj.img}
+                  src={obj?.img}
                   alt={`img${index + 1}`}
                   className="carousel__image"
                 />
@@ -98,7 +97,7 @@ export default function Carousel() {
         </button>
 
         <div className="carousel__nav" style={{ display: "none" }}>
-          {carouselData.map((_, index) => (
+          {carouselData?.map((_, index) => (
             <button
               key={index}
               className={`carousel__indicator ${

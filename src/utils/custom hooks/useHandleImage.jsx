@@ -13,7 +13,7 @@ export default function useHandleImage(imgLink) {
     loadImage(imgLink)
       .then((resp) => setImgSrc(resp))
       .catch((err) => {
-        if (env.MODE === "production") {
+        if (env?.MODE === "production") {
           addDoc(collection(db, "errors"), {
             [Date()]: {
               ...err,

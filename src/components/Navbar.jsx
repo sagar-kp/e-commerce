@@ -12,8 +12,8 @@ import { addDoc, collection, doc, getDoc, updateDoc } from "firebase/firestore";
 const env = import.meta.env;
 
 export default function Navbar() {
-  const cart = useSelector((state) => state.cartReducer);
-  const state = useSelector((state) => state.storeReducer);
+  const cart = useSelector((state) => state?.cartReducer);
+  const state = useSelector((state) => state?.storeReducer);
   const dispatch = useDispatch();
   const [ipFocus, setIpFocus] = useState(false);
   const [accountsHover, setAccountsHover] = useState(false);
@@ -22,10 +22,9 @@ export default function Navbar() {
   const location = useLocation();
   const { pathname, search } = location;
   const windowDimensions = useWindowDimensions();
-  // console.log(location,auth.currentUser)
-  // console.log(cart)
+
   const redirectApropriately = (link) => {
-    if (auth.currentUser) navigate(link);
+    if (auth?.currentUser) navigate(link);
     else {
       dispatch(
         STORE_DATA({
@@ -40,7 +39,7 @@ export default function Navbar() {
     dispatch(
       STORE_DATA({
         key: "historyData",
-        value: pathname + (search.length > 0 ? search : ""),
+        value: pathname + (search?.length > 0 ? search : ""),
       })
     );
     setAccountsHover(false);
@@ -48,8 +47,7 @@ export default function Navbar() {
   };
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
-      // console.log(user)
-      if (state.isSignUp)
+      if (state?.isSignUp)
         dispatch(
           STORE_DATA({
             key: "isSignUp",
@@ -58,14 +56,14 @@ export default function Navbar() {
         );
       else if (user) {
         // const { proactiveRefresh={}, auth={}, ...remData} = user
-        // // console.log(remData)
+
         // dispatch(STORE_DATA({
         //   key:"userData", value: remData
         // }))
 
-        getDoc(doc(db, "users", user.uid))
+        getDoc(doc(db, "users", user?.uid))
           .then((resp) => {
-            const data = resp.data();
+            const data = resp?.data();
             dispatch(
               STORE_DATA({
                 key: "userPurchase",
@@ -73,17 +71,16 @@ export default function Navbar() {
               })
             );
 
-            for (let key of Object.keys(data.cart)) {
-              dispatch(ADD_ITEM(data.cart[key]));
+            for (let key of Object.keys(data?.cart)) {
+              dispatch(ADD_ITEM(data?.cart?.[key]));
             }
           })
           .catch((err) => {
-            if (env.MODE === "production") {
+            if (env?.MODE === "production") {
               addDoc(collection(db, "errors"), {
                 [Date()]: {
                   ...err,
-                  moreDetails:
-                    "File:navbar Line:70 function:authstateChanged getDoc",
+                  moreDetails: "File:navbar function:authstateChanged getDoc",
                 },
               });
             } else console.log(err);
@@ -92,19 +89,17 @@ export default function Navbar() {
     });
   }, []);
   useEffect(() => {
-    if (auth.currentUser) {
-      updateDoc(doc(db, "users", auth.currentUser.uid), {
+    if (auth?.currentUser) {
+      updateDoc(doc(db, "users", auth?.currentUser?.uid), {
         cart,
       })
-        .then(() => {
-          // console.log("updated", cart)
-        })
+        .then(() => {})
         .catch((err) => {
-          if (env.MODE === "production") {
+          if (env?.MODE === "production") {
             addDoc(collection(db, "errors"), {
               [Date()]: {
                 ...err,
-                moreDetails: "File:navbar Line:88 function:updateDoc",
+                moreDetails: "File:navbar function:updateDoc",
               },
             });
           } else console.log(err);
@@ -136,13 +131,13 @@ export default function Navbar() {
           onBlur={() => setIpFocus(false)}
           placeholder="Search Amazon.in"
           value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          onChange={(e) => setInputValue(e?.target?.value)}
         />
         <div
           className="navbar__search-icon"
           style={{ outline: ipFocus && "3.5px solid rgb(254, 190, 103)" }}
           onClick={() => {
-            if (inputValue.length > 0) navigate(`/s?k=${inputValue}`);
+            if (inputValue?.length > 0) navigate(`/s?k=${inputValue}`);
           }}
         >
           <i className="bi bi-search"></i>
@@ -156,11 +151,11 @@ export default function Navbar() {
         >
           <div style={{ fontSize: "12px", marginBottom: "-3px" }}>
             Hello,{" "}
-            {!auth.currentUser
+            {!auth?.currentUser
               ? "sign in"
-              : auth.currentUser?.displayName?.length > 0
-              ? auth.currentUser.displayName
-              : auth.currentUser?.email}
+              : auth?.currentUser?.displayName?.length > 0
+              ? auth?.currentUser?.displayName
+              : auth?.currentUser?.email}
           </div>
           <div style={{ fontWeight: "bold", fontSize: "14px" }}>
             Accounts & Lists
@@ -176,11 +171,11 @@ export default function Navbar() {
             onMouseOut={() => setAccountsHover(false)}
             className="navbar__hover"
             style={{
-              marginTop: !auth.currentUser ? "190px" : "151px",
-              right: windowDimensions.windowWidth > 1200 ? "220px" : "90",
+              marginTop: !auth?.currentUser ? "190px" : "151px",
+              right: windowDimensions?.windowWidth > 1200 ? "220px" : "90",
             }}
           >
-            {!auth.currentUser && (
+            {!auth?.currentUser && (
               <div style={{ textAlign: "center" }}>
                 <button onClick={() => signInUpTasks("/signin")}>
                   Sign in
@@ -197,11 +192,6 @@ export default function Navbar() {
             <div
               onMouseOver={() => setAccountsHover(true)}
               onMouseOut={() => setAccountsHover(false)}
-              style={
-                {
-                  //display:"flex",
-                }
-              }
             >
               {/* <div style={{flex:"50%", marginLeft:"15px"}}>
               <div style={{fontSize:"15px", fontWeight:"bold"}}>Your Lists</div>
@@ -232,7 +222,7 @@ export default function Navbar() {
                   Your orders
                 </div>
                 {/* <div style={{fontSize:"small", marginTop:"7px"}}>Your account</div> */}
-                {auth.currentUser && (
+                {auth?.currentUser && (
                   <div
                     onClick={() => {
                       signOut(auth)
@@ -247,12 +237,11 @@ export default function Navbar() {
                           navigate("/signin");
                         })
                         .catch((err) => {
-                          if (env.MODE === "production") {
+                          if (env?.MODE === "production") {
                             addDoc(collection(db, "errors"), {
                               [Date()]: {
                                 ...err,
-                                moreDetails:
-                                  "File:navbar Line:166 function:signOut",
+                                moreDetails: "File:navbar function:signOut",
                               },
                             });
                           } else console.log(err);
@@ -274,7 +263,7 @@ export default function Navbar() {
             </div>
           </div>
         )}
-        {windowDimensions.windowWidth > 1200 && (
+        {windowDimensions?.windowWidth > 1200 && (
           <div
             style={{ color: "white", cursor: "pointer", height: "100%" }}
             onClick={() => redirectApropriately("/orders")}
@@ -292,8 +281,8 @@ export default function Navbar() {
           onClick={() => navigate("/cart")}
           style={{
             margin: `0px ${
-              Object.keys(cart).reduce(
-                (sum, key) => sum + cart[key].quantity,
+              Object.keys(cart)?.reduce(
+                (sum, key) => sum + cart?.[key]?.quantity,
                 0
               ) > 9
                 ? "-31px"
@@ -301,14 +290,14 @@ export default function Navbar() {
             } 3px 0px`,
           }}
         >
-          {Object.keys(cart).length > 0
-            ? Object.keys(cart).reduce(
-                (sum, key) => sum + cart[key].quantity,
+          {Object.keys(cart)?.length > 0
+            ? Object.keys(cart)?.reduce(
+                (sum, key) => sum + cart?.[key]?.quantity,
                 0
               ) > 9
               ? "9+"
-              : Object.keys(cart).reduce(
-                  (sum, key) => sum + cart[key].quantity,
+              : Object.keys(cart)?.reduce(
+                  (sum, key) => sum + cart?.[key]?.quantity,
                   0
                 )
             : 0}
