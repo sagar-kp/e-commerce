@@ -17,9 +17,9 @@ const env = import.meta.env;
 
 const Item = ({ item }) => {
   const dispatch = useDispatch();
-  const cart = useSelector((state) => state.cartReducer);
+  const cart = useSelector((state) => state?.cartReducer);
   const navigate = useNavigate();
-  const imgSrc = useHandleImage(cart[item].img_link);
+  const imgSrc = useHandleImage(cart?.[item]?.img_link);
 
   return (
     <div className="cart__container">
@@ -30,31 +30,31 @@ const Item = ({ item }) => {
         <div
           style={{ fontSize: "20px" }}
           className="search__productname"
-          onClick={() => navigate(`/p?name=${cart[item].product_name}`)}
+          onClick={() => navigate(`/p?name=${cart?.[item]?.product_name}`)}
         >
-          {cart[item].product_name}
+          {cart?.[item]?.product_name}
         </div>
         <div
           style={{ marginTop: "10px", fontWeight: "bold", fontSize: "19px" }}
         >
-          {cart[item].discounted_price}
+          {cart?.[item]?.discounted_price}
         </div>
         <div className="cart__modify">
           <div className="cart__select-div">
             Qty:
             <select
-              value={cart[item].quantity}
+              value={cart?.[item]?.quantity}
               onChange={(e) => {
                 //modify in cloud db
                 dispatch(
                   ADD_ITEM({
-                    ...cart[item],
-                    quantity: parseInt(e.target.value),
+                    ...cart?.[item],
+                    quantity: parseInt(e?.target?.value),
                   })
                 );
               }}
             >
-              {Array.from({ length: 20 }, (_, i) => i + 1).map((no) => (
+              {Array.from({ length: 20 }, (_, i) => i + 1)?.map((no) => (
                 <option key={no} item={no} value={no}>
                   {no}
                 </option>
@@ -66,7 +66,7 @@ const Item = ({ item }) => {
             style={{ color: "#004e93", cursor: "pointer" }}
             onClick={() => {
               //modify in cloud db
-              dispatch(REMOVE_ITEM(cart[item].product_name));
+              dispatch(REMOVE_ITEM(cart?.[item]?.product_name));
             }}
           >
             Delete
@@ -78,8 +78,8 @@ const Item = ({ item }) => {
 };
 
 export default function Cart() {
-  const cart = useSelector((state) => state.cartReducer);
-  const state = useSelector((state) => state.storeReducer);
+  const cart = useSelector((state) => state?.cartReducer);
+  const state = useSelector((state) => state?.storeReducer);
   const [checkOut, setCheckOut] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -94,12 +94,12 @@ export default function Cart() {
   ) : (
     <div style={{ display: "flex", background: "rgb(235, 236, 238" }}>
       <div className="cart__main">
-        {Object.keys(cart).length > 0 && (
+        {Object.keys(cart)?.length > 0 && (
           <div className="cart__heading">Shopping Cart</div>
         )}
-        {Object.keys(cart).length > 0 ? (
-          Object.keys(cart).map((key) => <Item item={key} key={key} />)
-        ) : !auth.currentUser ? (
+        {Object.keys(cart)?.length > 0 ? (
+          Object.keys(cart)?.map((key) => <Item item={key} key={key} />)
+        ) : !auth?.currentUser ? (
           <div className="cart__empty">
             <div style={{ flex: "30%" }}>
               <img src={emptyCart} alt="empty-cart" />
@@ -139,40 +139,40 @@ export default function Cart() {
         className="cart__purchase"
         style={{
           backgroundColor: `${
-            Object.keys(cart).length > 0 ? "white" : "transparent"
+            Object.keys(cart)?.length > 0 ? "white" : "transparent"
           }`,
         }}
       >
-        {Object.keys(cart).length > 0 && (
+        {Object.keys(cart)?.length > 0 && (
           <>
             <div style={{ fontSize: "20px", marginTop: "20px" }}>
               Subtotal (
-              {Object.keys(cart).reduce(
-                (sum, key) => sum + cart[key].quantity,
+              {Object.keys(cart)?.reduce(
+                (sum, key) => sum + cart?.[key]?.quantity,
                 0
               )}{" "}
               items):
               <span style={{ fontWeight: "bold" }}>
                 ₹{" "}
                 {Object.keys(cart)
-                  .reduce(
+                  ?.reduce(
                     (sum, key) =>
                       sum +
                       parseFloat(
-                        cart[key].discounted_price
-                          .replaceAll(",", "")
-                          .replace("₹", "")
+                        cart?.[key]?.discounted_price
+                          ?.replaceAll(",", "")
+                          ?.replace("₹", "")
                       ) *
-                        cart[key].quantity,
+                        cart?.[key]?.quantity,
                     0
                   )
-                  .toLocaleString()}
+                  ?.toLocaleString()}
               </span>
             </div>
             <button
               className="cart__buy"
               onClick={() => {
-                if (!auth.currentUser) {
+                if (!auth?.currentUser) {
                   dispatch(
                     STORE_DATA({
                       key: "historyData",
@@ -186,9 +186,9 @@ export default function Cart() {
                     STORE_DATA({
                       key: "userPurchase",
                       value: {
-                        ...state.userPurchase,
+                        ...state?.userPurchase,
                         orders: {
-                          ...state.userPurchase.orders,
+                          ...state?.userPurchase?.orders,
                           [Date()]: cart,
                         },
                         cart: {},
@@ -196,9 +196,9 @@ export default function Cart() {
                     })
                   );
                   // update firestore
-                  updateDoc(doc(db, "users", auth.currentUser.uid), {
+                  updateDoc(doc(db, "users", auth?.currentUser?.uid), {
                     cart: {},
-                    orders: { ...state.userPurchase.orders, [Date()]: cart },
+                    orders: { ...state?.userPurchase?.orders, [Date()]: cart },
                   })
                     .then(() => {})
                     .catch((err) => {

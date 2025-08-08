@@ -6,7 +6,7 @@ export default function Categories({ obj }) {
   return (
     <div className="categories__card">
       <h3 style={{ height: "55px" }} className="overflow-manager">
-        {obj.offer}
+        {obj?.offer}
       </h3>
       <div
         style={{
@@ -24,13 +24,13 @@ export default function Categories({ obj }) {
             }}
             onClick={() =>
               navigate(
-                `s?hidden-keywords=${obj[`img${imgNo}`][2].join("+%7C+")}`
+                `s?hidden-keywords=${obj?.[`img${imgNo}`]?.[2]?.join("+%7C+")}`
               )
             }
           >
-            <img src={obj[`img${imgNo}`][0]} style={{ width: "99%" }} />
+            <img src={obj?.[`img${imgNo}`]?.[0]} style={{ width: "99%" }} />
             <div className="categories__name overflow-manager">
-              {obj[`img${imgNo}`][1]}
+              {obj?.[`img${imgNo}`]?.[1]}
             </div>
           </div>
         ))}
@@ -39,13 +39,13 @@ export default function Categories({ obj }) {
         className="categories__see-more"
         onClick={() => {
           const categories = [1, 2, 3, 4].map((imgNo) =>
-            obj[`img${imgNo}`][2].join("+%7C+")
+            obj?.[`img${imgNo}`]?.[2]?.join("+%7C+")
           );
-          navigate(`s?hidden-keywords=${categories.join("+%7C+")}`);
+          navigate(`s?hidden-keywords=${categories?.join("+%7C+")}`);
           // console.log(categories.join("+|+"))
         }}
       >
-        {obj.more}
+        {obj?.more}
       </div>
     </div>
   );

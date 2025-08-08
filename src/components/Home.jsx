@@ -14,12 +14,12 @@ export default function Home() {
         style={{
           display: "grid",
           gridTemplateColumns: `repeat(${
-            windowDimensions.windowWidth > 1000 ? 4 : 3
+            windowDimensions?.windowWidth > 1000 ? 4 : 3
           }, minmax(0, 1fr))`,
         }}
       >
-        {categoriesData.map((obj) => (
-          <Categories key={obj.offer} obj={obj} />
+        {categoriesData?.map((obj) => (
+          <Categories key={obj?.offer} obj={obj} />
         ))}
       </section>
     </div>

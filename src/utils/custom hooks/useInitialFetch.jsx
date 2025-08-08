@@ -9,23 +9,23 @@ const env = import.meta.env;
 
 export default function useInitialFetch(varName, endpt) {
   const dispatch = useDispatch();
-  const data = useSelector((state) => state.storeReducer[varName]);
+  const data = useSelector((state) => state?.storeReducer?.[varName]);
 
   // fetch data
   useEffect(() => {
-    if (data.length === 0)
+    if (data?.length === 0)
       getData(endpt)
         .then((resp) => {
           // console.log(resp)
           dispatch(
             STORE_DATA({
               key: varName,
-              value: resp.data,
+              value: resp?.data,
             })
           );
         })
         .catch((err) => {
-          if (env.MODE === "production") {
+          if (env?.MODE === "production") {
             addDoc(collection(db, "errors"), {
               [Date()]: {
                 ...err,

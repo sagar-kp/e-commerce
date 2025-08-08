@@ -16,9 +16,9 @@ export default function useFilterResults(searchResults, setDisplayData) {
         max >= 0 &&
         min >= 0
       ) {
-        tempDisplayArr = tempDisplayArr.filter((obj) => {
+        tempDisplayArr = tempDisplayArr?.filter((obj) => {
           let price = parseFloat(
-            obj.discounted_price.split("₹")[1].replaceAll(",", "")
+            obj?.discounted_price?.split("₹")?.[1]?.replaceAll(",", "")
           );
           return price >= min && price < max;
         });
@@ -27,29 +27,28 @@ export default function useFilterResults(searchResults, setDisplayData) {
 
     const filterByRating = (min) => {
       if (typeof min === "number") {
-        tempDisplayArr = tempDisplayArr.filter((obj) => obj.rating > min);
+        tempDisplayArr = tempDisplayArr?.filter((obj) => obj?.rating > min);
       }
     };
 
     const filterByCategory = (category) => {
-      // console.log(category)
-      if (category.length > 0) {
-        tempDisplayArr = tempDisplayArr.filter((obj) =>
-          obj.category.includes(category)
+      if (category?.length > 0) {
+        tempDisplayArr = tempDisplayArr?.filter((obj) =>
+          obj?.category?.includes(category)
         );
       }
     };
-    // console.log("selected triggered")
 
     if (
-      selected.category.length !== 0 ||
-      selected.rating !== -1 ||
-      (selected.price.min !== -1 && selected.price.max !== -1)
+      selected?.category?.length !== 0 ||
+      selected?.rating !== -1 ||
+      (selected?.price?.min !== -1 && selected?.price?.max !== -1)
     ) {
-      if (selected.category.length !== 0) filterByCategory(selected.category);
-      if (selected.rating !== -1) filterByRating(selected.rating);
-      if (selected.price.min !== -1 && selected.price.max !== -1)
-        filterByPrice(selected.price.min, selected.price.max);
+      if (selected?.category?.length !== 0)
+        filterByCategory(selected?.category);
+      if (selected?.rating !== -1) filterByRating(selected?.rating);
+      if (selected?.price?.min !== -1 && selected?.price?.max !== -1)
+        filterByPrice(selected?.price?.min, selected?.price?.max);
       setDisplayData(tempDisplayArr);
     } else setDisplayData([...searchResults]);
   }, [selected]);
