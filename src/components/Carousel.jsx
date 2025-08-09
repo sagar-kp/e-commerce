@@ -20,7 +20,7 @@ const CarouselImage = ({ src, alt }) => {
 
 export default function Carousel() {
   const navigate = useNavigate();
-  const carouselData = useInitialFetch("carouselData", "carousel");
+  const { data: carouselData } = useInitialFetch("carouselData", "carousel");
   const [handleClick, handleDotsClick] = useCarouselUtils(carouselData);
 
   return (
