@@ -207,12 +207,12 @@ export default function Search() {
   );
   const categoriesQuery = searchParams.get("hidden-keywords");
   const query = searchParams.get("k");
-  // console.log(searchResults, noResult)
+
   // set search results based on query strings
   useEffect(() => {
     setNoResult(false);
     setSearchResults(() => []);
-    // console.log(categoriesQuery)
+
     if (categoriesQuery) {
       setLoading(true);
       getData(

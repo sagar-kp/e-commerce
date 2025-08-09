@@ -14,28 +14,30 @@ export default function useInitialFetch(varName, endpt) {
 
   // fetch data
   useEffect(() => {
-    if (data?.length === 0) setLoading(true);
-    getData(endpt)
-      .then((resp) => {
-        dispatch(
-          STORE_DATA({
-            key: varName,
-            value: resp?.data,
-          })
-        );
-        setLoading(false);
-      })
-      .catch((err) => {
-        setLoading(false);
-        if (env?.MODE === "production") {
-          addDoc(collection(db, "errors"), {
-            [Date()]: {
-              ...err,
-              moreDetails: `File:hookInitialFetch Line:29 function:getData link:${endpt}`,
-            },
-          });
-        } else console.log(err);
-      });
+    if (data?.length === 0) {
+      setLoading(true);
+      getData(endpt)
+        .then((resp) => {
+          dispatch(
+            STORE_DATA({
+              key: varName,
+              value: resp?.data,
+            })
+          );
+          setLoading(false);
+        })
+        .catch((err) => {
+          setLoading(false);
+          if (env?.MODE === "production") {
+            addDoc(collection(db, "errors"), {
+              [Date()]: {
+                ...err,
+                moreDetails: `File:hookInitialFetch Line:29 function:getData link:${endpt}`,
+              },
+            });
+          } else console.log(err);
+        });
+    }
   }, []);
 
   return { data, loading };
