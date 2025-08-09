@@ -5,7 +5,7 @@ import {
   RESET_CART,
   STORE_DATA,
 } from "../redux_/actions/action";
-import { emptyCart } from "../assets/images";
+import { emptyCart, Loading } from "../assets/images";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { updateDoc, doc, addDoc, collection } from "firebase/firestore";
@@ -24,7 +24,11 @@ const Item = ({ item }) => {
   return (
     <div className="cart__container">
       <div style={{ flex: "20%" }}>
-        <img src={imgSrc} alt="product-image" />
+        <img
+          className={`${!imgSrc ? "fade-animation" : ""}`}
+          src={imgSrc ?? Loading}
+          alt="product-image"
+        />
       </div>
       <div style={{ flex: "58%", paddingLeft: "2%" }}>
         <div
@@ -79,7 +83,9 @@ const Item = ({ item }) => {
 
 export default function Cart() {
   const cart = useSelector((state) => state?.cartReducer);
-  const state = useSelector((state) => state?.storeReducer);
+  const userPurchase = useSelector(
+    (state) => state?.storeReducer?.userPurchase
+  );
   const [checkOut, setCheckOut] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -106,7 +112,7 @@ export default function Cart() {
             </div>
             <div style={{ flex: "66%", marginLeft: "4%" }}>
               <div style={{ fontSize: "22px", fontWeight: "bold" }}>
-                Your Amazon Cart is empty
+                Your Amazing Cart is empty
               </div>
               <div className="cart__deals" onClick={() => navigate("/")}>
                 Shop today's deals
@@ -129,7 +135,7 @@ export default function Cart() {
           </div>
         ) : (
           <div className="cart__signedin-empty">
-            <span>Your Amazon Cart is empty.</span>
+            <span>Your Amazing Cart is empty.</span>
             <br />
             <Link to="/">Continue shopping</Link>
           </div>
@@ -186,10 +192,10 @@ export default function Cart() {
                     STORE_DATA({
                       key: "userPurchase",
                       value: {
-                        ...state?.userPurchase,
+                        ...userPurchase,
                         orders: {
-                          ...state?.userPurchase?.orders,
                           [Date()]: cart,
+                          ...userPurchase?.orders,
                         },
                         cart: {},
                       },
@@ -198,7 +204,7 @@ export default function Cart() {
                   // update firestore
                   updateDoc(doc(db, "users", auth?.currentUser?.uid), {
                     cart: {},
-                    orders: { ...state?.userPurchase?.orders, [Date()]: cart },
+                    orders: { [Date()]: cart, ...userPurchase?.orders },
                   })
                     .then(() => {})
                     .catch((err) => {

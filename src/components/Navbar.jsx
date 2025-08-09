@@ -13,7 +13,7 @@ const env = import.meta.env;
 
 export default function Navbar() {
   const cart = useSelector((state) => state?.cartReducer);
-  const state = useSelector((state) => state?.storeReducer);
+  const isSignUp = useSelector((state) => state?.storeReducer?.isSignUp);
   const dispatch = useDispatch();
   const [ipFocus, setIpFocus] = useState(false);
   const [accountsHover, setAccountsHover] = useState(false);
@@ -47,7 +47,7 @@ export default function Navbar() {
   };
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
-      if (state?.isSignUp)
+      if (isSignUp)
         dispatch(
           STORE_DATA({
             key: "isSignUp",
@@ -106,19 +106,18 @@ export default function Navbar() {
         });
     }
   }, [cart]);
-  // console.log(Object.keys(cart).length>0?Object.keys(cart).reduce((a,b)=>cart[a].quantity+cart[b].quantity):0)
   return pathname === "/signin" || pathname === "/signup" ? (
     <></>
   ) : (
-    <header style={{ backgroundColor: "black", display: "flex" }}>
+    <header style={{ backgroundColor: "rgb(21, 21, 21)", display: "flex" }}>
       <nav style={{ flex: "10%" }}>
         <img
           src={logo}
           alt="logo"
           onClick={() => navigate("/")}
           style={{
-            width: "100px",
-            margin: "15px 15px 10px",
+            width: "125px",
+            margin: "9px 10px 0px",
             cursor: "pointer",
           }}
         />
@@ -129,7 +128,7 @@ export default function Navbar() {
           className="navbar__input"
           onFocus={() => setIpFocus(true)}
           onBlur={() => setIpFocus(false)}
-          placeholder="Search Amazon.in"
+          placeholder="Search Amazing-ecom"
           value={inputValue}
           onChange={(e) => setInputValue(e?.target?.value)}
         />

@@ -4,11 +4,24 @@ import { getData, loadImage } from "../utils/apiCalls";
 import "./styles/product.css";
 import { useDispatch, useSelector } from "react-redux";
 import { ADD_ITEM } from "../redux_/actions/action";
-import { userImg } from "../assets/images";
+import { Loading, userImg } from "../assets/images";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../utils/firebaseConfig";
+import { useHandleImage } from "../utils/custom hooks";
 
 const env = import.meta.env;
+
+const ProductImage = ({ product }) => {
+  const imgSrc = useHandleImage(product?.img_link);
+  return (
+    <img
+      className={`${!imgSrc ? "fade-animation" : ""}`}
+      src={imgSrc ?? Loading}
+      alt="product-image"
+      style={{ width: "100%" }}
+    />
+  );
+};
 
 export default function Product() {
   const [searchParams] = useSearchParams();
@@ -17,10 +30,8 @@ export default function Product() {
   const [errorLoadingData, setErrorLoadingData] = useState(false);
   const dispatch = useDispatch();
   const cart = useSelector((state) => state?.cartReducer);
-  // const state = useSelector(state=> state.storeReducer)
+
   const [quantity, setQuantity] = useState(1);
-  // console.log(product,cart, reviews)
-  const [imgSrc, setImgSrc] = useState("");
 
   // Load product
   useEffect(() => {
@@ -80,23 +91,6 @@ export default function Product() {
     }
   }, []);
 
-  // Load image
-  useEffect(() => {
-    if (product)
-      loadImage(product?.img_link)
-        .then((resp) => setImgSrc(resp))
-        .catch((err) => {
-          if (env?.MODE === "production") {
-            addDoc(collection(db, "errors"), {
-              [Date()]: {
-                ...err,
-                moreDetails: `File:product Line:79 function:loadImage imgLink:${product.img_link}`,
-              },
-            });
-          } else console.log(err);
-        });
-  }, [product]);
-
   return errorLoadingData ? (
     <div className="product__error">Some error occurred</div>
   ) : Object.keys(product)?.length === 0 ? (
@@ -105,7 +99,7 @@ export default function Product() {
     <>
       <section style={{ display: "flex", marginTop: "3%" }}>
         <div style={{ flex: "46%", margin: "0% 0% 0% 1.5%" }}>
-          <img src={imgSrc} alt="product-image" style={{ width: "100%" }} />
+          <ProductImage product={product} />
         </div>
         <div className="product__details">
           <h2>{product.product_name}</h2>
@@ -176,15 +170,6 @@ export default function Product() {
           <button
             onClick={() => {
               dispatch(ADD_ITEM({ ...product, quantity }));
-              // if (Object.keys(state.userData).length>0){
-              //   const cartData = {...cart, [product.product_name]:{...product, quantity}}
-              //   console.log(cartData)
-              //   updateDoc(doc(db, "users", state.userData.uid),{
-              //     cart: cartData
-              //   })
-              //   .then(resp=> console.log(resp))
-              //   .catch(err=> console.log(err))
-              // }
             }}
           >
             Add to Cart

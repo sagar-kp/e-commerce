@@ -5,6 +5,7 @@ import "./styles/search.css";
 import { useFilterResults, useHandleImage } from "../utils/custom hooks";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../utils/firebaseConfig";
+import { Loading } from "../assets/images";
 
 const env = import.meta.env;
 const priceArr = [0, 1000, 5000, 10000, 20000, 20000];
@@ -45,7 +46,11 @@ const SearchCard = ({ obj }) => {
   return (
     <div className="search__card-container">
       <div style={{ flex: "25%" }}>
-        <img src={imgSrc} alt="product_image" />
+        <img
+          className={`${!imgSrc ? "fade-animation" : ""}`}
+          src={imgSrc ?? Loading}
+          alt="product_image"
+        />
       </div>
       <div style={{ paddingLeft: "10px", flex: "75%" }}>
         <p

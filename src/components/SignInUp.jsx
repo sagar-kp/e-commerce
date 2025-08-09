@@ -22,7 +22,7 @@ export default function SignInUp() {
     username: "",
   });
   const [invalidCred, setInvalidCred] = useState(false);
-  const state = useSelector((state) => state?.storeReducer);
+  const historyData = useSelector((state) => state?.storeReducer?.historyData);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -95,7 +95,7 @@ export default function SignInUp() {
           password: "",
           username: "",
         }));
-        navigate(state?.historyData ? state.historyData : "/");
+        navigate(historyData ?? "/");
       })
       .catch((err) => {
         if (pathname === "/signin") setInvalidCred(true);
@@ -120,7 +120,12 @@ export default function SignInUp() {
   return (
     <div className="signinup__container">
       <section>
-        <img src={logo2} alt="logo" />
+        <img
+          src={logo2}
+          alt="logo"
+          style={{ margin: "2% 0%", cursor: "pointer" }}
+          onClick={() => navigate("/")}
+        />
         <form onSubmit={handleSubmit}>
           <p>Sign {pathname === "/signin" ? "in" : "up"}</p>
 
@@ -208,10 +213,10 @@ export default function SignInUp() {
         {pathname === "/signin" && (
           <div className="signinup__create-account">
             <hr />
-            <span>New to Amazon?</span>
+            <span>New to Amazing?</span>
             <br />
             <button onClick={() => navigate("/signup")}>
-              Create your Amazon account
+              Create your Amazing account
             </button>
           </div>
         )}

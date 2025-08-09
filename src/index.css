@@ -20,3 +20,16 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.fade-animation {
+  animation: fadeOpacity 0.4s infinite alternate;
+}
+
+@keyframes fadeOpacity {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.5;
+  }
+}
