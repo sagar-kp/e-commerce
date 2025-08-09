@@ -1,5 +1,19 @@
 import { useNavigate } from "react-router-dom";
 import "./styles/categories.css";
+import { LoadingCategory } from "../assets/images";
+import { useHandleImage } from "../utils/custom hooks";
+
+const CategoryImage = ({ src, alt }) => {
+  const imgSrc = useHandleImage(src, "category");
+  return (
+    <img
+      className={`${!imgSrc ? "fade-animation" : ""}`}
+      src={imgSrc ?? LoadingCategory}
+      alt={alt ?? "image category"}
+      style={{ width: "99%" }}
+    />
+  );
+};
 
 export default function Categories({ obj }) {
   const navigate = useNavigate();
@@ -28,7 +42,11 @@ export default function Categories({ obj }) {
               )
             }
           >
-            <img src={obj?.[`img${imgNo}`]?.[0]} style={{ width: "99%" }} />
+            <CategoryImage
+              src={obj?.[`img${imgNo}`]?.[0]}
+              alt={obj?.[`img${imgNo}`]?.[1]}
+            />
+
             <div className="categories__name overflow-manager">
               {obj?.[`img${imgNo}`]?.[1]}
             </div>
@@ -42,7 +60,6 @@ export default function Categories({ obj }) {
             obj?.[`img${imgNo}`]?.[2]?.join("+%7C+")
           );
           navigate(`s?hidden-keywords=${categories?.join("+%7C+")}`);
-          // console.log(categories.join("+|+"))
         }}
       >
         {obj?.more}

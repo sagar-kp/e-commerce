@@ -1,6 +1,22 @@
 import "./styles/carousel.css";
 import { useNavigate } from "react-router-dom";
-import { useInitialFetch, useCarouselUtils } from "../utils/custom hooks";
+import {
+  useInitialFetch,
+  useCarouselUtils,
+  useHandleImage,
+} from "../utils/custom hooks";
+import { LoadingCarousel } from "../assets/images";
+
+const CarouselImage = ({ src, alt }) => {
+  const imgSrc = useHandleImage(src, "carousel");
+  return (
+    <img
+      className={`carousel__image ${!imgSrc ? "fade-animation" : ""}`}
+      src={imgSrc ?? LoadingCarousel}
+      alt={alt}
+    />
+  );
+};
 
 export default function Carousel() {
   const navigate = useNavigate();
@@ -54,11 +70,7 @@ export default function Carousel() {
                   index === 0 ? "current-slide" : ""
                 }`}
               >
-                <img
-                  src={obj?.img}
-                  alt={`img${index + 1}`}
-                  className="carousel__image"
-                />
+                <CarouselImage src={obj?.img} alt={`img${index + 1}`} />
               </li>
             ))}
           </ul>

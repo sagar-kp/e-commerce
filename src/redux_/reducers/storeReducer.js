@@ -3,7 +3,7 @@ import { STORE_DATA } from "../actionTypes";
 const initialState = {
   carouselData: [],
   categoriesData: [],
-  historyData: "",
+  historyData: null,
   userPurchase: {},
   isSignUp: false,
 };
