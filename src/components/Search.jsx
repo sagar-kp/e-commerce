@@ -6,6 +6,7 @@ import { useFilterResults, useHandleImage } from "../utils/custom hooks";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../utils/firebaseConfig";
 import { Loading } from "../assets/images";
+import Spinner from "./Spinner";
 
 const env = import.meta.env;
 const priceArr = [0, 1000, 5000, 10000, 20000, 20000];
@@ -198,29 +199,33 @@ export default function Search() {
   const [noResult, setNoResult] = useState(false);
   const [displayData, setDisplayData] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState();
+
   const [selected, setSelected] = useFilterResults(
     searchResults,
     setDisplayData
   );
   const categoriesQuery = searchParams.get("hidden-keywords");
   const query = searchParams.get("k");
-  // console.log(searchResults, noResult)
+
   // set search results based on query strings
   useEffect(() => {
     setNoResult(false);
     setSearchResults(() => []);
-    // console.log(categoriesQuery)
-    if (categoriesQuery)
+
+    if (categoriesQuery) {
+      setLoading(true);
       getData(
         `products/search?category=${categoriesQuery}&product_name=${categoriesQuery}`
       )
         .then((resp) => {
-          // console.log(resp)
           if (resp?.data?.length > 0) {
             setSearchResults((prevArr) => [...prevArr, ...resp?.data]);
           } else if (searchResults.length === 0) setNoResult(true);
+          setLoading(false);
         })
         .catch((err) => {
+          setLoading(false);
           if (env?.MODE === "production") {
             addDoc(collection(db, "errors"), {
               [Date()]: {
@@ -230,12 +235,15 @@ export default function Search() {
             });
           } else console.log(err);
         });
-    if (query)
+    }
+    if (query) {
+      setLoading(true);
       getData(`products/search?category=${query}&product_name=${query}`)
         .then((resp) => {
           if (resp?.data?.length > 0) {
             setSearchResults((prevArr) => [...prevArr, ...resp?.data]);
           } else if (searchResults?.length === 0) setNoResult(true);
+          setLoading(false);
         })
         .catch((err) => {
           if (env?.MODE === "production") {
@@ -246,7 +254,9 @@ export default function Search() {
               },
             });
           } else console.log(err);
+          setLoading(false);
         });
+    }
   }, [query, categoriesQuery]);
 
   // set categories
@@ -272,6 +282,8 @@ export default function Search() {
         Try checking your spelling or use more general terms
       </span>
     </div>
+  ) : loading ? (
+    <Spinner />
   ) : (
     <div style={{ display: "flex" }}>
       <div style={{ flex: "20%", paddingLeft: "10px" }}>

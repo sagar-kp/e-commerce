@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import "./styles/orders.css";
 import { useHandleImage } from "../utils/custom hooks";
 import { auth } from "../utils/firebaseConfig";
 import { Loading } from "../assets/images";
+import Spinner from "./Spinner";
 
 const Item = ({ productName, date }) => {
   const userPurchase = useSelector(
@@ -47,11 +48,18 @@ export default function Orders() {
   const userPurchase = useSelector(
     (state) => state?.storeReducer?.userPurchase
   );
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   useEffect(() => {
-    if (!auth?.currentUser) navigate("/signin");
+    setLoading(true);
+    setTimeout(() => {
+      if (!auth?.currentUser) navigate("/signin");
+      setLoading(false);
+    }, 2000);
   }, []);
-  return userPurchase?.orders &&
+  return loading ? (
+    <Spinner />
+  ) : userPurchase?.orders &&
     Object.keys(userPurchase?.orders)?.length === 0 ? (
     <section className="orders__no-orders">
       No orders yet. <br />

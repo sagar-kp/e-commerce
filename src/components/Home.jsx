@@ -2,11 +2,17 @@ import "./styles/categories.css";
 import Carousel from "./Carousel";
 import Categories from "./Categories";
 import { useInitialFetch, useWindowDimensions } from "../utils/custom hooks";
+import Spinner from "./Spinner";
 
 export default function Home() {
-  const categoriesData = useInitialFetch("categoriesData", "categories");
+  const { data: categoriesData, loading } = useInitialFetch(
+    "categoriesData",
+    "categories"
+  );
   const windowDimensions = useWindowDimensions();
-  return (
+  return loading ? (
+    <Spinner />
+  ) : (
     <div style={{ width: "100%" }}>
       <Carousel />
       <section

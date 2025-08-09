@@ -8,6 +8,7 @@ import { Loading, userImg } from "../assets/images";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../utils/firebaseConfig";
 import { useHandleImage } from "../utils/custom hooks";
+import Spinner from "./Spinner";
 
 const env = import.meta.env;
 
@@ -28,10 +29,11 @@ export default function Product() {
   const [product, setProduct] = useState({});
   const [reviews, setReviews] = useState({});
   const [errorLoadingData, setErrorLoadingData] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [loading, setLoading] = useState();
+
   const dispatch = useDispatch();
   const cart = useSelector((state) => state?.cartReducer);
-
-  const [quantity, setQuantity] = useState(1);
 
   // Load product
   useEffect(() => {
@@ -66,6 +68,7 @@ export default function Product() {
       setProduct(data);
       setQuantity(data?.quantity);
     } else {
+      setLoading(true);
       getData(`products/search?product_name=${productName}`)
         .then((res) => {
           const data = res?.data?.[0];
@@ -76,8 +79,10 @@ export default function Product() {
           } else {
             setErrorLoadingData(true);
           }
+          setLoading(false);
         })
         .catch((err) => {
+          setLoading(false);
           if (env?.MODE === "production") {
             addDoc(collection(db, "errors"), {
               [Date()]: {
@@ -91,10 +96,10 @@ export default function Product() {
     }
   }, []);
 
-  return errorLoadingData ? (
+  return loading ? (
+    <Spinner />
+  ) : errorLoadingData ? (
     <div className="product__error">Some error occurred</div>
-  ) : Object.keys(product)?.length === 0 ? (
-    <></>
   ) : (
     <>
       <section style={{ display: "flex", marginTop: "3%" }}>
