@@ -113,6 +113,11 @@ export default function SignInUp() {
         } else console.log(err);
       });
   };
+  const handleChange = (e) =>
+    setInputData((prevData) => ({
+      ...prevData,
+      [e?.target?.name]: e?.target?.value,
+    }));
   useEffect(() => {
     if (auth?.currentUser) navigate("/");
   }, []);
@@ -141,12 +146,7 @@ export default function SignInUp() {
               <br />
               <input
                 value={inputData?.username}
-                onChange={(e) =>
-                  setInputData((prevData) => ({
-                    ...prevData,
-                    username: e?.target?.value,
-                  }))
-                }
+                onChange={handleChange}
                 name="username"
               />
               {inputData?.username?.length > 0 &&
@@ -161,12 +161,7 @@ export default function SignInUp() {
           <br />
           <input
             value={inputData?.email}
-            onChange={(e) =>
-              setInputData((prevData) => ({
-                ...prevData,
-                email: e?.target?.value,
-              }))
-            }
+            onChange={handleChange}
             name="email"
           />
           {inputData?.email?.length > 0 &&
@@ -179,12 +174,7 @@ export default function SignInUp() {
           <br />
           <input
             value={inputData?.password}
-            onChange={(e) =>
-              setInputData((prevData) => ({
-                ...prevData,
-                password: e?.target?.value,
-              }))
-            }
+            onChange={handleChange}
             name="password"
             type="password"
           />

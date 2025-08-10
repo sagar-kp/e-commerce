@@ -104,18 +104,30 @@ const SearchCard = ({ obj }) => {
 
 const PriceComp = ({ selected, setSelected }) => {
   const [inputPrice, setInputPrice] = useState({ min: -1, max: -1 });
-
+  const resetPriceClick = () => {
+    setSelected((prev) => ({ ...prev, price: { min: -1, max: -1 } }));
+    setInputPrice((prev) => ({ ...prev, min: -1, max: -1 }));
+  };
+  const filterPrice = (index, price) => {
+    setInputPrice((prev) => ({ ...prev, min: -1, max: -1 }));
+    setSelected((prev) => ({
+      ...prev,
+      price: {
+        min: priceArr[index],
+        max: index === priceArr.length - 2 ? 100000 : price,
+      },
+    }));
+  };
+  const handleChange = (e) =>
+    setInputPrice((prevPrice) => ({
+      ...prevPrice,
+      [e?.target?.name]: parseFloat(e?.target?.value),
+    }));
   return (
     <>
       <p className="title">Price</p>
       {selected?.price?.min !== -1 && selected?.price?.max !== -1 && (
-        <p
-          className="options"
-          onClick={() => {
-            setSelected((prev) => ({ ...prev, price: { min: -1, max: -1 } }));
-            setInputPrice((prev) => ({ ...prev, min: -1, max: -1 }));
-          }}
-        >
+        <p className="options" onClick={resetPriceClick}>
           <LeftIcon />
           Any Price
         </p>
@@ -127,16 +139,7 @@ const PriceComp = ({ selected, setSelected }) => {
           style={{
             fontWeight: priceArr[index] === selected?.price?.min && "bold",
           }}
-          onClick={() => {
-            setInputPrice((prev) => ({ ...prev, min: -1, max: -1 }));
-            setSelected((prev) => ({
-              ...prev,
-              price: {
-                min: priceArr[index],
-                max: index === priceArr.length - 2 ? 100000 : price,
-              },
-            }));
-          }}
+          onClick={() => filterPrice(index, price)}
         >
           {`
           ${
@@ -156,24 +159,16 @@ const PriceComp = ({ selected, setSelected }) => {
           value={inputPrice?.min >= 0 && inputPrice?.min}
           placeholder="Min"
           type="number"
-          onChange={(e) =>
-            setInputPrice((prevPrice) => ({
-              ...prevPrice,
-              min: parseFloat(e?.target?.value),
-            }))
-          }
+          name="min"
+          onChange={handleChange}
         />
         <input
           className="price__input"
           value={inputPrice?.max >= 0 && inputPrice?.max}
           placeholder="Max"
           type="number"
-          onChange={(e) =>
-            setInputPrice((prevPrice) => ({
-              ...prevPrice,
-              max: parseFloat(e?.target?.value),
-            }))
-          }
+          name="max"
+          onChange={handleChange}
           style={{ marginLeft: "3px" }}
         />
         <button

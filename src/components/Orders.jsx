@@ -8,13 +8,11 @@ import { Loading } from "../assets/images";
 import Spinner from "./Spinner";
 
 const Item = ({ productName, date }) => {
-  const userPurchase = useSelector(
-    (state) => state?.storeReducer?.userPurchase
+  const orders = useSelector(
+    (state) => state?.storeReducer?.userPurchase?.orders
   );
   const navigate = useNavigate();
-  const imgSrc = useHandleImage(
-    userPurchase?.orders?.[date]?.[productName]?.img_link
-  );
+  const imgSrc = useHandleImage(orders?.[date]?.[productName]?.img_link);
   return (
     <div style={{ display: "flex", margin: "0% 25% 0% 3%" }}>
       <div
@@ -28,9 +26,9 @@ const Item = ({ productName, date }) => {
           style={{ width: "70%", cursor: "pointer" }}
         />
       </div>
-      {userPurchase?.orders?.[date]?.[productName]?.quantity > 0 && (
+      {orders?.[date]?.[productName]?.quantity > 0 && (
         <div className="orders__quantity">
-          {userPurchase?.orders?.[date]?.[productName]?.quantity}
+          {orders?.[date]?.[productName]?.quantity}
         </div>
       )}
       <div
@@ -45,8 +43,8 @@ const Item = ({ productName, date }) => {
 };
 
 export default function Orders() {
-  const userPurchase = useSelector(
-    (state) => state?.storeReducer?.userPurchase
+  const orders = useSelector(
+    (state) => state?.storeReducer?.userPurchase?.orders
   );
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -59,8 +57,7 @@ export default function Orders() {
   }, []);
   return loading ? (
     <Spinner />
-  ) : userPurchase?.orders &&
-    Object.keys(userPurchase?.orders)?.length === 0 ? (
+  ) : orders && Object.keys(orders)?.length === 0 ? (
     <section className="orders__no-orders">
       No orders yet. <br />
       <Link to="/">Start shopping</Link>
@@ -68,8 +65,8 @@ export default function Orders() {
   ) : (
     <section style={{ margin: "3% 15% 0%" }}>
       <p style={{ fontSize: "xx-large", marginBottom: "20px" }}>Your orders</p>
-      {userPurchase?.orders &&
-        Object.keys(userPurchase?.orders)?.map((date) => (
+      {orders &&
+        Object.keys(orders)?.map((date) => (
           <div key={date} className="orders__container">
             <div className="orders__date-total">
               <div style={{ flex: "5%" }}>
@@ -80,9 +77,9 @@ export default function Orders() {
               <div style={{ flex: "60%" }}>
                 Total
                 <br />₹{" "}
-                {Object.keys(userPurchase?.orders?.[date])
+                {Object.keys(orders?.[date])
                   ?.reduce((acc, productName) => {
-                    const obj = userPurchase?.orders?.[date]?.[productName];
+                    const obj = orders?.[date]?.[productName];
                     return (acc +=
                       obj?.quantity *
                       Number(
@@ -95,7 +92,7 @@ export default function Orders() {
             <div className="orders__delivery-date">
               Delivered {new Date(date)?.toDateString()?.slice(4)}
             </div>
-            {Object.keys(userPurchase?.orders?.[date])?.map((productName) => (
+            {Object.keys(orders?.[date])?.map((productName) => (
               // Card component
               <Item key={productName} productName={productName} date={date} />
             ))}

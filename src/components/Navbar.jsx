@@ -45,6 +45,32 @@ export default function Navbar() {
     setAccountsHover(false);
     navigate(link);
   };
+  const handleSignOutClick = () => {
+    signOut(auth)
+      .then(() => {
+        dispatch(
+          STORE_DATA({
+            key: "userPurchase",
+            value: {
+              cart: {},
+              orders: {},
+            },
+          })
+        );
+        setAccountsHover(false);
+        navigate("/signin");
+      })
+      .catch((err) => {
+        if (env?.MODE === "production") {
+          addDoc(collection(db, "errors"), {
+            [Date()]: {
+              ...err,
+              moreDetails: "File:navbar function:signOut",
+            },
+          });
+        } else console.log(err);
+      });
+  };
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (isSignUp)
@@ -55,19 +81,19 @@ export default function Navbar() {
           })
         );
       else if (user) {
-        // const { proactiveRefresh={}, auth={}, ...remData} = user
-
-        // dispatch(STORE_DATA({
-        //   key:"userData", value: remData
-        // }))
-
         getDoc(doc(db, "users", user?.uid))
           .then((resp) => {
             const data = resp?.data();
+            const sortedOrders = Object.keys(data?.orders || {})
+              .sort((a, b) => new Date(b) - new Date(a))
+              .reduce((acc, key) => {
+                acc[key] = data?.orders[key];
+                return acc;
+              }, {});
             dispatch(
               STORE_DATA({
                 key: "userPurchase",
-                value: data,
+                value: { ...data, orders: sortedOrders },
               })
             );
 
@@ -223,32 +249,7 @@ export default function Navbar() {
                 {/* <div style={{fontSize:"small", marginTop:"7px"}}>Your account</div> */}
                 {auth?.currentUser && (
                   <div
-                    onClick={() => {
-                      signOut(auth)
-                        .then(() => {
-                          dispatch(
-                            STORE_DATA({
-                              key: "userPurchase",
-                              value: {},
-                            })
-                          );
-                          setAccountsHover(false);
-                          navigate("/signin");
-                        })
-                        .catch((err) => {
-                          if (env?.MODE === "production") {
-                            addDoc(collection(db, "errors"), {
-                              [Date()]: {
-                                ...err,
-                                moreDetails: "File:navbar function:signOut",
-                              },
-                            });
-                          } else console.log(err);
-                        });
-                      // dispatch(STORE_DATA({
-                      //   key:"userData", value:{}
-                      // }))
-                    }}
+                    onClick={handleSignOutClick}
                     style={{
                       fontSize: "small",
                       marginTop: "7px",
