@@ -17,6 +17,12 @@ const CategoryImage = ({ src, alt }) => {
 
 export default function Categories({ obj }) {
   const navigate = useNavigate();
+  const handleSeeMoreClick = () => {
+    const categories = [1, 2, 3, 4].map((imgNo) =>
+      obj?.[`img${imgNo}`]?.[2]?.join("+%7C+")
+    );
+    navigate(`s?hidden-keywords=${categories?.join("+%7C+")}`);
+  };
   return (
     <div className="categories__card">
       <h3 style={{ height: "55px" }} className="overflow-manager">
@@ -53,15 +59,7 @@ export default function Categories({ obj }) {
           </div>
         ))}
       </div>
-      <div
-        className="categories__see-more"
-        onClick={() => {
-          const categories = [1, 2, 3, 4].map((imgNo) =>
-            obj?.[`img${imgNo}`]?.[2]?.join("+%7C+")
-          );
-          navigate(`s?hidden-keywords=${categories?.join("+%7C+")}`);
-        }}
-      >
+      <div className="categories__see-more" onClick={handleSeeMoreClick}>
         {obj?.more}
       </div>
     </div>

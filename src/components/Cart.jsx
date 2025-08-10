@@ -89,7 +89,52 @@ export default function Cart() {
   const [checkOut, setCheckOut] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  // console.log(cart)
+  const handleBuyClick = () => {
+    if (!auth?.currentUser) {
+      dispatch(
+        STORE_DATA({
+          key: "historyData",
+          value: "/cart",
+        })
+      );
+      navigate("/signin");
+    } else {
+      //update userPurchase in redux
+      dispatch(
+        STORE_DATA({
+          key: "userPurchase",
+          value: {
+            ...userPurchase,
+            orders: {
+              [Date()]: cart,
+              ...userPurchase?.orders,
+            },
+            cart: {},
+          },
+        })
+      );
+      // update firestore
+      updateDoc(doc(db, "users", auth?.currentUser?.uid), {
+        cart: {},
+        orders: { [Date()]: cart, ...userPurchase?.orders },
+      })
+        .then(() => {})
+        .catch((err) => {
+          if (env.MODE === "production") {
+            addDoc(collection(db, "errors"), {
+              [Date()]: {
+                ...err,
+                moreDetails: "File:Cart Line:141 function:checkout updatedoc",
+              },
+            });
+          } else console.log(err);
+        });
+
+      setCheckOut(true);
+      // update cart data
+      dispatch(RESET_CART());
+    }
+  };
   return checkOut ? (
     <p className="cart__checkout">
       <div>Thank you for shopping with us</div>
@@ -175,56 +220,7 @@ export default function Cart() {
                   ?.toLocaleString()}
               </span>
             </div>
-            <button
-              className="cart__buy"
-              onClick={() => {
-                if (!auth?.currentUser) {
-                  dispatch(
-                    STORE_DATA({
-                      key: "historyData",
-                      value: "/cart",
-                    })
-                  );
-                  navigate("/signin");
-                } else {
-                  //update userPurchase in redux
-                  dispatch(
-                    STORE_DATA({
-                      key: "userPurchase",
-                      value: {
-                        ...userPurchase,
-                        orders: {
-                          [Date()]: cart,
-                          ...userPurchase?.orders,
-                        },
-                        cart: {},
-                      },
-                    })
-                  );
-                  // update firestore
-                  updateDoc(doc(db, "users", auth?.currentUser?.uid), {
-                    cart: {},
-                    orders: { [Date()]: cart, ...userPurchase?.orders },
-                  })
-                    .then(() => {})
-                    .catch((err) => {
-                      if (env.MODE === "production") {
-                        addDoc(collection(db, "errors"), {
-                          [Date()]: {
-                            ...err,
-                            moreDetails:
-                              "File:Cart Line:141 function:checkout updatedoc",
-                          },
-                        });
-                      } else console.log(err);
-                    });
-
-                  setCheckOut(true);
-                  // update cart data
-                  dispatch(RESET_CART());
-                }
-              }}
-            >
+            <button className="cart__buy" onClick={handleBuyClick}>
               Proceed to Buy
             </button>
           </>
