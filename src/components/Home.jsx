@@ -2,17 +2,13 @@ import "./styles/categories.css";
 import Carousel from "./Carousel";
 import Categories from "./Categories";
 import { useInitialFetch, useWindowDimensions } from "../utils/custom hooks";
-import Spinner from "./Spinner";
+import { placeholderCategoriesData } from "../utils/placeholderData";
 
 export default function Home() {
-  const { data: categoriesData, loading } = useInitialFetch(
-    "categoriesData",
-    "categories"
-  );
+  const { data } = useInitialFetch("categoriesData", "categories");
+  const categoriesData = data?.length ? data : placeholderCategoriesData;
   const windowDimensions = useWindowDimensions();
-  return loading ? (
-    <Spinner />
-  ) : (
+  return (
     <div style={{ width: "100%" }}>
       <Carousel />
       <section
@@ -24,8 +20,8 @@ export default function Home() {
           }, minmax(0, 1fr))`,
         }}
       >
-        {categoriesData?.map((obj) => (
-          <Categories key={obj?.offer} obj={obj} />
+        {categoriesData?.map((obj, index) => (
+          <Categories key={obj?.offer?.length ? obj.offer : index} obj={obj} />
         ))}
       </section>
     </div>

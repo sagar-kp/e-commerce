@@ -4,7 +4,7 @@ import { LoadingCategory } from "../assets/images";
 import { useHandleImage } from "../utils/custom hooks";
 
 const CategoryImage = ({ src, alt }) => {
-  const imgSrc = useHandleImage(src, "category");
+  const imgSrc = src ? useHandleImage(src, "category") : null;
   return (
     <img
       className={`${!imgSrc ? "fade-animation" : ""}`}
@@ -21,7 +21,14 @@ export default function Categories({ obj }) {
     const categories = [1, 2, 3, 4].map((imgNo) =>
       obj?.[`img${imgNo}`]?.[2]?.join("+%7C+")
     );
-    navigate(`s?hidden-keywords=${categories?.join("+%7C+")}`);
+    const keywords = categories?.join("+%7C+");
+    if (keywords?.length) navigate(`s?hidden-keywords=${keywords}`);
+  };
+  const handleImageClick = (imgNo) => {
+    const keywords = obj?.[`img${imgNo}`]?.[2]?.join("+%7C+");
+    if (keywords?.length) {
+      navigate(`s?hidden-keywords=${keywords}`);
+    }
   };
   return (
     <div className="categories__card">
@@ -42,11 +49,7 @@ export default function Categories({ obj }) {
                 imgNo % 2 === 0 ? "5px" : "0px"
               }`,
             }}
-            onClick={() =>
-              navigate(
-                `s?hidden-keywords=${obj?.[`img${imgNo}`]?.[2]?.join("+%7C+")}`
-              )
-            }
+            onClick={() => handleImageClick(imgNo)}
           >
             <CategoryImage
               src={obj?.[`img${imgNo}`]?.[0]}
