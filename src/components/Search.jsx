@@ -262,7 +262,6 @@ export default function Search() {
       searchResults?.forEach((obj) =>
         obj?.category?.split("|")?.forEach((category) => tempSet?.add(category))
       );
-      // console.log(tempSet)
       setCategories([...tempSet]);
     } else if (searchResults?.length === 0) setCategories(() => []);
   }, [searchResults]);

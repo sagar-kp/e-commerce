@@ -10,12 +10,10 @@ const env = import.meta.env;
 export default function useInitialFetch(varName, endpt) {
   const dispatch = useDispatch();
   const data = useSelector((state) => state?.storeReducer?.[varName]);
-  const [loading, setLoading] = useState();
 
   // fetch data
   useEffect(() => {
     if (data?.length === 0) {
-      setLoading(true);
       getData(endpt)
         .then((resp) => {
           dispatch(
@@ -24,10 +22,8 @@ export default function useInitialFetch(varName, endpt) {
               value: resp?.data,
             })
           );
-          setLoading(false);
         })
         .catch((err) => {
-          setLoading(false);
           if (env?.MODE === "production") {
             addDoc(collection(db, "errors"), {
               [Date()]: {
@@ -40,5 +36,5 @@ export default function useInitialFetch(varName, endpt) {
     }
   }, []);
 
-  return { data, loading };
+  return { data };
 }
