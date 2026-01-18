@@ -70,10 +70,8 @@ export default function Product() {
         .then((res) => {
           const data = res?.data?.[0];
           if (data) {
-            setTimeout(() => {
-              setReviewData(data);
-              setProduct(data);
-            }, 5000);
+            setReviewData(data);
+            setProduct(data);
           } else {
             setErrorLoadingData(true);
           }
