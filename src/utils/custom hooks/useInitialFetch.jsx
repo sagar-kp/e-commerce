@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { STORE_DATA } from "../../redux_/actions/action";
 import { getData } from "../apiCalls";
@@ -20,13 +20,13 @@ export default function useInitialFetch(varName, endpt) {
             STORE_DATA({
               key: varName,
               value: resp?.data,
-            })
+            }),
           );
         })
         .catch((err) => {
           if (env?.MODE === "production") {
             addDoc(collection(db, "errors"), {
-              [Date()]: {
+              [String(new Date())]: {
                 ...err,
                 moreDetails: `File:hookInitialFetch Line:29 function:getData link:${endpt}`,
               },

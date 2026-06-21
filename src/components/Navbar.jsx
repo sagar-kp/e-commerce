@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { logo } from "../assets/images";
 import { useDispatch, useSelector } from "react-redux";
 import "./styles/navbar.css";
@@ -30,7 +30,7 @@ export default function Navbar() {
         STORE_DATA({
           key: "historyData",
           value: link,
-        })
+        }),
       );
       navigate("/signin");
     }
@@ -40,7 +40,7 @@ export default function Navbar() {
       STORE_DATA({
         key: "historyData",
         value: pathname + (search?.length > 0 ? search : ""),
-      })
+      }),
     );
     setAccountsHover(false);
     navigate(link);
@@ -55,7 +55,7 @@ export default function Navbar() {
               cart: {},
               orders: {},
             },
-          })
+          }),
         );
         setAccountsHover(false);
         navigate("/signin");
@@ -63,7 +63,7 @@ export default function Navbar() {
       .catch((err) => {
         if (env?.MODE === "production") {
           addDoc(collection(db, "errors"), {
-            [Date()]: {
+            [String(new Date())]: {
               ...err,
               moreDetails: "File:navbar function:signOut",
             },
@@ -71,6 +71,58 @@ export default function Navbar() {
         } else console.log(err);
       });
   };
+
+  const getDisplayableValue = () => {
+    if (!auth?.currentUser) return "sign in";
+    if (auth?.currentUser?.displayName?.length > 0)
+      return auth?.currentUser?.displayName;
+    return auth?.currentUser?.email;
+  };
+
+  const performUserLogin = () => {
+    getDoc(doc(db, "users", user?.uid))
+      .then((resp) => {
+        const data = resp?.data();
+        const sortedOrders = Object.keys(data?.orders || {})
+          .sort((a, b) => new Date(b) - new Date(a))
+          .reduce((acc, key) => {
+            acc[key] = data?.orders[key];
+            return acc;
+          }, {});
+        dispatch(
+          STORE_DATA({
+            key: "userPurchase",
+            value: { ...data, orders: sortedOrders },
+          }),
+        );
+
+        for (let key of Object.keys(data?.cart)) {
+          dispatch(ADD_ITEM(data?.cart?.[key]));
+        }
+      })
+      .catch((err) => {
+        if (env?.MODE === "production") {
+          addDoc(collection(db, "errors"), {
+            [String(new Date())]: {
+              ...err,
+              moreDetails: "File:navbar function:authstateChanged getDoc",
+            },
+          });
+        } else console.log(err);
+      });
+  };
+
+  const getItemsInCart = () => {
+    if (Object.keys(cart)?.length > 0) {
+      const itemsInCart = Object.keys(cart)?.reduce(
+        (sum, key) => sum + cart?.[key]?.quantity,
+        0,
+      );
+      return itemsInCart > 9 ? "9+" : itemsInCart;
+    }
+    return 0;
+  };
+
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (isSignUp)
@@ -78,39 +130,10 @@ export default function Navbar() {
           STORE_DATA({
             key: "isSignUp",
             value: false,
-          })
+          }),
         );
       else if (user) {
-        getDoc(doc(db, "users", user?.uid))
-          .then((resp) => {
-            const data = resp?.data();
-            const sortedOrders = Object.keys(data?.orders || {})
-              .sort((a, b) => new Date(b) - new Date(a))
-              .reduce((acc, key) => {
-                acc[key] = data?.orders[key];
-                return acc;
-              }, {});
-            dispatch(
-              STORE_DATA({
-                key: "userPurchase",
-                value: { ...data, orders: sortedOrders },
-              })
-            );
-
-            for (let key of Object.keys(data?.cart)) {
-              dispatch(ADD_ITEM(data?.cart?.[key]));
-            }
-          })
-          .catch((err) => {
-            if (env?.MODE === "production") {
-              addDoc(collection(db, "errors"), {
-                [Date()]: {
-                  ...err,
-                  moreDetails: "File:navbar function:authstateChanged getDoc",
-                },
-              });
-            } else console.log(err);
-          });
+        performUserLogin();
       }
     });
   }, []);
@@ -123,7 +146,7 @@ export default function Navbar() {
         .catch((err) => {
           if (env?.MODE === "production") {
             addDoc(collection(db, "errors"), {
-              [Date()]: {
+              [String(new Date())]: {
                 ...err,
                 moreDetails: "File:navbar function:updateDoc",
               },
@@ -137,16 +160,17 @@ export default function Navbar() {
   ) : (
     <header style={{ backgroundColor: "rgb(21, 21, 21)", display: "flex" }}>
       <nav style={{ flex: "10%" }}>
-        <img
-          src={logo}
-          alt="logo"
-          onClick={() => navigate("/")}
-          style={{
-            width: "125px",
-            margin: "9px 10px 0px",
-            cursor: "pointer",
-          }}
-        />
+        <Link to="/">
+          <img
+            src={logo}
+            alt="logo"
+            style={{
+              width: "125px",
+              margin: "9px 10px 0px",
+              cursor: "pointer",
+            }}
+          />
+        </Link>
       </nav>
 
       <nav className="navbar__search">
@@ -158,7 +182,7 @@ export default function Navbar() {
           value={inputValue}
           onChange={(e) => setInputValue(e?.target?.value)}
         />
-        <div
+        <button
           className="navbar__search-icon"
           style={{ outline: ipFocus && "3.5px solid rgb(254, 190, 103)" }}
           onClick={() => {
@@ -166,37 +190,33 @@ export default function Navbar() {
           }}
         >
           <i className="bi bi-search"></i>
-        </div>
+        </button>
       </nav>
       <nav className="navbar__authenticate">
-        <div
-          style={{ color: "white", cursor: "pointer", height: "100%" }}
+        <button
+          className="navbar__accounts-lists"
           onMouseOver={() => setAccountsHover(true)}
+          onFocus={() => setAccountsHover(true)}
           onMouseOut={() => setAccountsHover(false)}
+          onBlur={() => setAccountsHover(false)}
         >
-          <div style={{ fontSize: "12px", marginBottom: "-3px" }}>
-            Hello,{" "}
-            {!auth?.currentUser
-              ? "sign in"
-              : auth?.currentUser?.displayName?.length > 0
-              ? auth?.currentUser?.displayName
-              : auth?.currentUser?.email}
+          <div>Hello, {getDisplayableValue()}</div>
+          <div>
+            <span>Accounts & Lists</span>
+            <i className="bi bi-caret-down-fill"></i>
           </div>
-          <div style={{ fontWeight: "bold", fontSize: "14px" }}>
-            Accounts & Lists
-            <i
-              style={{ fontSize: "8px", color: "lightgray", marginLeft: "3px" }}
-              className="bi bi-caret-down-fill"
-            ></i>
-          </div>
-        </div>
+        </button>
         {accountsHover && (
           <div
             onMouseOver={() => setAccountsHover(true)}
+            onFocus={() => setAccountsHover(true)}
+            onBlur={() => setAccountsHover(false)}
             onMouseOut={() => setAccountsHover(false)}
             className="navbar__hover"
+            role="menu"
+            tabIndex={0}
             style={{
-              marginTop: !auth?.currentUser ? "190px" : "151px",
+              marginTop: auth?.currentUser ? "151px" : "190px",
               right: windowDimensions?.windowWidth > 1200 ? "220px" : "90",
             }}
           >
@@ -205,26 +225,27 @@ export default function Navbar() {
                 <button onClick={() => signInUpTasks("/signin")}>
                   Sign in
                 </button>
-                <div style={{ fontSize: "x-small", margin: "5px 0px 20px" }}>
-                  New customer?{" "}
-                  <span onClick={() => signInUpTasks("/signup")}>
+                <div className="navbar__new-customer">
+                  <span>New customer? </span>
+                  <button onClick={() => signInUpTasks("/signup")}>
                     start here
-                  </span>
-                  .
+                  </button>
+                  <span>.</span>
                 </div>
               </div>
             )}
             <div
               onMouseOver={() => setAccountsHover(true)}
+              onFocus={() => setAccountsHover(true)}
+              onBlur={() => setAccountsHover(false)}
               onMouseOut={() => setAccountsHover(false)}
+              role="menu"
+              tabIndex={0}
             >
-              {/* <div style={{flex:"50%", marginLeft:"15px"}}>
-              <div style={{fontSize:"15px", fontWeight:"bold"}}>Your Lists</div>
-            </div> */}
               <div
                 style={{
                   paddingLeft: "15px",
-                  color: "white", //flex:"50%", borderLeft:"1px solid lightgray"
+                  color: "white",
                 }}
               >
                 <div
@@ -236,76 +257,57 @@ export default function Navbar() {
                 >
                   Your account
                 </div>
-                <div
-                  style={{
-                    fontSize: "small",
-                    marginTop: "7px",
-                    cursor: "pointer",
-                  }}
+                <button
+                  className="navbar__your-orders"
                   onClick={() => redirectApropriately("/orders")}
                 >
                   Your orders
-                </div>
-                {/* <div style={{fontSize:"small", marginTop:"7px"}}>Your account</div> */}
+                </button>
                 {auth?.currentUser && (
-                  <div
+                  <button
+                    className="navbar__signout"
                     onClick={handleSignOutClick}
-                    style={{
-                      fontSize: "small",
-                      marginTop: "7px",
-                      cursor: "pointer",
-                    }}
                   >
                     Sign out
-                  </div>
+                  </button>
                 )}
               </div>
             </div>
           </div>
         )}
         {windowDimensions?.windowWidth > 1200 && (
-          <div
-            style={{ color: "white", cursor: "pointer", height: "100%" }}
+          <button
+            className="navbar__returns-orders"
             onClick={() => redirectApropriately("/orders")}
           >
-            <div style={{ fontSize: "12px", marginBottom: "-3px" }}>
-              Returns
-            </div>
-            <div style={{ fontWeight: "bold", fontSize: "14px" }}>& Orders</div>
-          </div>
+            <div>Returns</div>
+            <div>& Orders</div>
+          </button>
         )}
       </nav>
       <nav className="navbar__cart">
-        <div
+        <Link
           className="navbar__cart-number"
-          onClick={() => navigate("/cart")}
+          to="/cart"
           style={{
             margin: `0px ${
               Object.keys(cart)?.reduce(
                 (sum, key) => sum + cart?.[key]?.quantity,
-                0
+                0,
               ) > 9
                 ? "-31px"
                 : "-27px"
             } 3px 0px`,
           }}
         >
-          {Object.keys(cart)?.length > 0
-            ? Object.keys(cart)?.reduce(
-                (sum, key) => sum + cart?.[key]?.quantity,
-                0
-              ) > 9
-              ? "9+"
-              : Object.keys(cart)?.reduce(
-                  (sum, key) => sum + cart?.[key]?.quantity,
-                  0
-                )
-            : 0}
-        </div>
-        <i onClick={() => navigate("/cart")} className="bi bi-cart"></i>
-        <div className="navbar__cart-word" onClick={() => navigate("/cart")}>
+          {getItemsInCart()}
+        </Link>
+        <Link to="/cart">
+          <i className="bi bi-cart"></i>
+        </Link>
+        <Link className="navbar__cart-word" to="/cart">
           Cart
-        </div>
+        </Link>
       </nav>
     </header>
   );
