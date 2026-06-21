@@ -8,6 +8,11 @@ const getData = async (url) => {
 };
 
 const loadImg = (imageUrl, imageType = "product") => {
+  const getImageBasedOnProps = () => {
+    if (imageType === "product") return ErrorImg;
+    if (imageType === "category") return categoryError;
+    return carouselError;
+  };
   return new Promise((resolve) => {
     const img = new Image();
     img.src = imageUrl;
@@ -15,13 +20,7 @@ const loadImg = (imageUrl, imageType = "product") => {
       resolve(img.height < 5 ? ErrorImg : String(imageUrl));
     };
     img.onerror = () => {
-      resolve(
-        imageType === "product"
-          ? ErrorImg
-          : imageType === "category"
-          ? categoryError
-          : carouselError
-      );
+      resolve(getImageBasedOnProps());
     };
   });
 };

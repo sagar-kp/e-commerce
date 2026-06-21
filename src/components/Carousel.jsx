@@ -1,5 +1,5 @@
 import "./styles/carousel.css";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   useInitialFetch,
   useCarouselUtils,
@@ -7,12 +7,13 @@ import {
 } from "../utils/custom hooks";
 import { LoadingCarousel } from "../assets/images";
 import { placeholderCarouselData } from "../utils/placeholderData";
+import PropTypes from "prop-types";
 
 const CarouselImage = ({ src, alt }) => {
-  const imgSrc = src ? useHandleImage(src, "carousel") : null;
+  const imgSrc = useHandleImage(src, "carousel");
   return (
     <img
-      className={`carousel__image ${!imgSrc ? "fade-animation" : ""}`}
+      className={`carousel__image ${imgSrc ? "" : "fade-animation"}`}
       src={imgSrc ?? LoadingCarousel}
       alt={alt}
     />
@@ -48,7 +49,6 @@ const arrow = (left = false) => (
 );
 
 export default function Carousel() {
-  const navigate = useNavigate();
   const { data } = useInitialFetch("carouselData", "carousel");
   const carouselData = data?.length ? data : placeholderCarouselData;
   const [handleClick, handleDotsClick] = useCarouselUtils(carouselData);
@@ -57,6 +57,8 @@ export default function Carousel() {
     <section>
       <div className="carousel">
         <button
+          type="button"
+          aria-label="Previous Carousel Image"
           className="carousel__button carousel__button--left"
           onClick={handleClick}
         >
@@ -67,25 +69,22 @@ export default function Carousel() {
           <ul className="carousel__track">
             {carouselData?.map((obj, index) => (
               <li
-                key={index}
-                onClick={() => {
-                  if (obj?.keywords?.length) {
-                    navigate(
-                      `s?hidden-keywords=${obj?.keywords?.join("+%7C+")}`
-                    );
-                  }
-                }}
+                key={obj?.keywords?.join("+%7C+")}
                 className={`carousel__slide ${
                   index === 0 ? "current-slide" : ""
                 }`}
               >
-                <CarouselImage src={obj?.img} alt={`img${index + 1}`} />
+                <Link to={`s?hidden-keywords=${obj?.keywords?.join("+%7C+")}`}>
+                  <CarouselImage src={obj?.img} alt={`img${index + 1}`} />
+                </Link>
               </li>
             ))}
           </ul>
         </div>
 
         <button
+          type="button"
+          aria-label="Next Carousel Image"
           className="carousel__button carousel__button--right"
           onClick={handleClick}
         >
@@ -93,9 +92,9 @@ export default function Carousel() {
         </button>
 
         <div className="carousel__nav" style={{ display: "none" }}>
-          {carouselData?.map((_, index) => (
+          {carouselData?.map((obj, index) => (
             <button
-              key={index}
+              key={obj?.keywords?.join("+%7C+")}
               className={`carousel__indicator ${
                 index === 0 ? "current-slide" : ""
               }`}
@@ -107,3 +106,8 @@ export default function Carousel() {
     </section>
   );
 }
+
+CarouselImage.propTypes = {
+  src: PropTypes.string,
+  alt: PropTypes.string.isRequired,
+};

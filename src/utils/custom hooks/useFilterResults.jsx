@@ -17,8 +17,8 @@ export default function useFilterResults(searchResults, setDisplayData) {
         min >= 0
       ) {
         tempDisplayArr = tempDisplayArr?.filter((obj) => {
-          let price = parseFloat(
-            obj?.discounted_price?.split("₹")?.[1]?.replaceAll(",", "")
+          let price = Number.parseFloat(
+            obj?.discounted_price?.split("₹")?.[1]?.replaceAll(",", ""),
           );
           return price >= min && price < max;
         });
@@ -34,7 +34,7 @@ export default function useFilterResults(searchResults, setDisplayData) {
     const filterByCategory = (category) => {
       if (category?.length > 0) {
         tempDisplayArr = tempDisplayArr?.filter((obj) =>
-          obj?.category?.includes(category)
+          obj?.category?.includes(category),
         );
       }
     };

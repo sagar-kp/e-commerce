@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { getData } from "../utils/apiCalls";
 import "./styles/search.css";
 import { useFilterResults, useHandleImage } from "../utils/custom hooks";
@@ -7,6 +7,7 @@ import { addDoc, collection } from "firebase/firestore";
 import { db } from "../utils/firebaseConfig";
 import { Loading } from "../assets/images";
 import Spinner from "./Spinner";
+import PropTypes from "prop-types";
 
 const env = import.meta.env;
 const priceArr = [0, 1000, 5000, 10000, 20000, 20000];
@@ -40,41 +41,40 @@ const LeftIcon = () => (
 );
 
 const SearchCard = ({ obj }) => {
-  const navigate = useNavigate();
-
   const imgSrc = useHandleImage(obj?.img_link);
-
+  const getStarIconClass = (num) => {
+    if (num < obj?.rating) return "bi-star-fill";
+    if (
+      num > obj?.rating &&
+      Math.ceil(obj?.rating) === num &&
+      (obj?.rating * 10) % 10 >= 4
+    )
+      return "bi-star-half";
+    return "bi-star";
+  };
   return (
     <div className="search__card-container">
       <div style={{ flex: "25%" }}>
         <img
-          className={`${!imgSrc ? "fade-animation" : ""}`}
+          className={`${imgSrc ? "" : "fade-animation"}`}
           src={imgSrc ?? Loading}
           alt="product_image"
         />
       </div>
       <div style={{ paddingLeft: "10px", flex: "75%" }}>
-        <p
-          className="search__productname"
-          onClick={() => navigate(`/p?name=${obj?.product_name}`)}
+        <Link
+          className="search__productname mt-15"
+          to={`/p?name=${obj?.product_name}`}
         >
           {obj?.product_name}
-        </p>
+        </Link>
         <p className="search__rating">
           <span>
             {[1, 2, 3, 4, 5].map((num) => (
               <i
                 key={num}
                 style={{ color: "orange", fontSize: "16px" }}
-                className={`bi ${
-                  num < obj?.rating
-                    ? "bi-star-fill"
-                    : num > obj?.rating &&
-                      Math.ceil(obj?.rating) === num &&
-                      (obj?.rating * 10) % 10 >= 4
-                    ? "bi-star-half"
-                    : "bi-star"
-                } `}
+                className={`bi ${getStarIconClass(num)} `}
               ></i>
             ))}
           </span>
@@ -121,37 +121,35 @@ const PriceComp = ({ selected, setSelected }) => {
   const handleChange = (e) =>
     setInputPrice((prevPrice) => ({
       ...prevPrice,
-      [e?.target?.name]: parseFloat(e?.target?.value),
+      [e?.target?.name]: Number.parseFloat(e?.target?.value),
     }));
   return (
     <>
       <p className="title">Price</p>
       {selected?.price?.min !== -1 && selected?.price?.max !== -1 && (
-        <p className="options" onClick={resetPriceClick}>
+        <button className="button-options" onClick={resetPriceClick}>
           <LeftIcon />
           Any Price
-        </p>
+        </button>
       )}
       {priceArr?.slice(1)?.map((price, index) => (
-        <p
-          className="options"
-          key={index}
+        <button
+          className="button-options"
+          key={price}
           style={{
             fontWeight: priceArr[index] === selected?.price?.min && "bold",
           }}
           onClick={() => filterPrice(index, price)}
         >
           {`
-          ${
-            index === 0
-              ? "Under"
-              : index === priceArr?.length - 2
-              ? "Over"
-              : `₹${priceArr?.[index]?.toLocaleString()} -`
-          } 
+          ${(() => {
+            if (index === 0) return "Under";
+            if (index === priceArr?.length - 2) return "Over";
+            return `₹${priceArr?.[index]?.toLocaleString()} -`;
+          })()} 
           ₹${price?.toLocaleString()}
         `}
-        </p>
+        </button>
       ))}
       <div style={{ display: "flex" }}>
         <input
@@ -178,7 +176,6 @@ const PriceComp = ({ selected, setSelected }) => {
               ...selected,
               price: { ...inputPrice },
             }));
-            // filterByPrice(inputPrice.min, inputPrice.max)
           }}
         >
           Go
@@ -198,7 +195,7 @@ export default function Search() {
 
   const [selected, setSelected] = useFilterResults(
     searchResults,
-    setDisplayData
+    setDisplayData,
   );
   const categoriesQuery = searchParams.get("hidden-keywords");
   const query = searchParams.get("k");
@@ -211,11 +208,11 @@ export default function Search() {
     if (categoriesQuery) {
       setLoading(true);
       getData(
-        `products/search?category=${categoriesQuery}&product_name=${categoriesQuery}`
+        `products/search?category=${categoriesQuery}&product_name=${categoriesQuery}`,
       )
         .then((resp) => {
           if (resp?.data?.length > 0) {
-            setSearchResults((prevArr) => [...prevArr, ...resp?.data]);
+            setSearchResults((prevArr) => [...prevArr, ...(resp?.data ?? [])]);
           } else if (searchResults.length === 0) setNoResult(true);
           setLoading(false);
         })
@@ -223,7 +220,7 @@ export default function Search() {
           setLoading(false);
           if (env?.MODE === "production") {
             addDoc(collection(db, "errors"), {
-              [Date()]: {
+              [String(new Date())]: {
                 ...err,
                 moreDetails: `File:search Line:146 function:getData categriesQuery:${categoriesQuery}`,
               },
@@ -236,14 +233,14 @@ export default function Search() {
       getData(`products/search?category=${query}&product_name=${query}`)
         .then((resp) => {
           if (resp?.data?.length > 0) {
-            setSearchResults((prevArr) => [...prevArr, ...resp?.data]);
+            setSearchResults((prevArr) => [...prevArr, ...(resp?.data ?? [])]);
           } else if (searchResults?.length === 0) setNoResult(true);
           setLoading(false);
         })
         .catch((err) => {
           if (env?.MODE === "production") {
             addDoc(collection(db, "errors"), {
-              [Date()]: {
+              [String(new Date())]: {
                 ...err,
                 moreDetails: `File:search function:getData query${query}`,
               },
@@ -260,42 +257,47 @@ export default function Search() {
     if (searchResults?.length > 0) {
       let tempSet = new Set();
       searchResults?.forEach((obj) =>
-        obj?.category?.split("|")?.forEach((category) => tempSet?.add(category))
+        obj?.category
+          ?.split("|")
+          ?.forEach((category) => tempSet?.add(category)),
       );
       setCategories([...tempSet]);
     } else if (searchResults?.length === 0) setCategories(() => []);
   }, [searchResults]);
-  return noResult ? (
-    <div style={{ padding: "30px 20% 0px" }}>
-      No results for{" "}
-      {categoriesQuery
-        ? categoriesQuery?.replaceAll(" | ", " or ")
-        : query?.replaceAll(" | ", " or ")}
-      <br />
-      <span style={{ fontSize: "small" }}>
-        Try checking your spelling or use more general terms
-      </span>
-    </div>
-  ) : loading ? (
-    <Spinner />
-  ) : (
+
+  if (noResult || loading)
+    return noResult ? (
+      <div style={{ padding: "30px 20% 0px" }}>
+        No results for{" "}
+        {categoriesQuery
+          ? categoriesQuery?.replaceAll(" | ", " or ")
+          : query?.replaceAll(" | ", " or ")}
+        <br />
+        <span style={{ fontSize: "small" }}>
+          Try checking your spelling or use more general terms
+        </span>
+      </div>
+    ) : (
+      <Spinner />
+    );
+  return (
     <div style={{ display: "flex" }}>
       <div style={{ flex: "20%", paddingLeft: "10px" }}>
         {searchResults?.length > 0 && (
           <>
             <p className="title">Customer Review</p>
             {selected?.rating !== -1 && (
-              <p
-                className="options"
+              <button
+                className="button-options"
                 style={{ margin: "-7px 0px 0px" }}
                 onClick={() => setSelected((prev) => ({ ...prev, rating: -1 }))}
               >
                 <LeftIcon />
                 {` Clear`}
-              </p>
+              </button>
             )}
             {[4, 3, 2, 1].map((no) => (
-              <div
+              <button
                 key={no}
                 className="search__review-icon"
                 style={{ fontWeight: selected.rating === no && "bold" }}
@@ -309,7 +311,7 @@ export default function Search() {
                   ></i>
                 ))}{" "}
                 & Up
-              </div>
+              </button>
             ))}
           </>
         )}
@@ -318,31 +320,58 @@ export default function Search() {
         )}
         {categories?.length > 0 && <p className="title">Category</p>}
         {selected?.category?.length !== 0 && (
-          <p
-            className="options"
+          <button
+            className="button-options"
             onClick={() => setSelected((prev) => ({ ...prev, category: "" }))}
           >
             <LeftIcon />
             {` All Categories`}
-          </p>
+          </button>
         )}
         {categories?.map((obj) => (
-          <p
-            className="options"
+          <button
+            className="button-options"
             key={obj}
             style={{ fontWeight: obj === selected?.category && "bold" }}
             onClick={() => setSelected((prev) => ({ ...prev, category: obj }))}
           >
             {obj}
-          </p>
+          </button>
         ))}
       </div>
       <div style={{ flex: "80%" }}>
         {searchResults?.length > 0 && <h3>Results</h3>}
-        {displayData?.map((obj, index) => (
-          <SearchCard key={index} obj={obj} />
+        {displayData?.map((obj) => (
+          <SearchCard key={obj?.productId} obj={obj} />
         ))}
       </div>
     </div>
   );
 }
+
+SearchCard.propTypes = {
+  obj: PropTypes.shape({
+    img_link: PropTypes.string,
+    product_name: PropTypes.string,
+    rating: PropTypes.number,
+    rating_count: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    discounted_price: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    actual_price: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    discount_percentage: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string,
+    ]),
+  }),
+};
+
+PriceComp.propTypes = {
+  selected: PropTypes.shape({
+    price: PropTypes.shape({
+      min: PropTypes.number,
+      max: PropTypes.number,
+    }),
+    rating: PropTypes.number,
+    category: PropTypes.string,
+  }),
+  setSelected: PropTypes.func.isRequired,
+};

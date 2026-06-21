@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { logo2 } from "../assets/images";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { auth, db } from "../utils/firebaseConfig";
 import {
   signInWithEmailAndPassword,
@@ -35,7 +35,7 @@ export default function SignInUp() {
         STORE_DATA({
           key: "isSignUp",
           value: true,
-        })
+        }),
       );
     const fn =
       pathname === "/signin"
@@ -44,11 +44,6 @@ export default function SignInUp() {
     fn(auth, inputData?.email, inputData?.password)
       .then((resp) => {
         if (pathname === "/signup") {
-          // const { proactiveRefresh={}, auth={}, ...remData} = resp.user
-          // dispatch(STORE_DATA({
-          //   key:"userData", value: remData
-          // }))
-
           setDoc(doc(db, "users", resp?.user?.uid), {
             email: resp?.user?.email,
             cart: {},
@@ -63,13 +58,13 @@ export default function SignInUp() {
                     cart: {},
                     orders: {},
                   },
-                })
+                }),
               );
             })
             .catch((err) => {
               if (env?.MODE === "production") {
                 addDoc(collection(db, "errors"), {
-                  [Date()]: {
+                  [String(new Date())]: {
                     ...err,
                     moreDetails: "File:signin function: setDoc",
                   },
@@ -81,7 +76,7 @@ export default function SignInUp() {
             .catch((err) => {
               if (env?.MODE === "production") {
                 addDoc(collection(db, "errors"), {
-                  [Date()]: {
+                  [String(new Date())]: {
                     ...err,
                     moreDetails: "File:signin Line:63 function:updateProfile",
                   },
@@ -101,7 +96,7 @@ export default function SignInUp() {
         if (pathname === "/signin") setInvalidCred(true);
         if (env?.MODE === "production") {
           addDoc(collection(db, "errors"), {
-            [Date()]: {
+            [String(new Date())]: {
               ...err,
               moreDetails: `File:signin function:${
                 pathname === "/signin"
@@ -125,12 +120,13 @@ export default function SignInUp() {
   return (
     <div className="signinup__container">
       <section>
-        <img
-          src={logo2}
-          alt="logo"
-          style={{ margin: "2% 0%", cursor: "pointer" }}
-          onClick={() => navigate("/")}
-        />
+        <Link to="/">
+          <img
+            src={logo2}
+            alt="logo"
+            style={{ margin: "2% 0%", cursor: "pointer" }}
+          />
+        </Link>
         <form onSubmit={handleSubmit}>
           <p>Sign {pathname === "/signin" ? "in" : "up"}</p>
 

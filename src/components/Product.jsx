@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getData, loadImage } from "../utils/apiCalls";
+import { getData } from "../utils/apiCalls";
 import "./styles/product.css";
 import { useDispatch, useSelector } from "react-redux";
 import { ADD_ITEM } from "../redux_/actions/action";
@@ -9,14 +9,15 @@ import { addDoc, collection } from "firebase/firestore";
 import { db } from "../utils/firebaseConfig";
 import { useHandleImage } from "../utils/custom hooks";
 import { placeholderProductsData } from "../utils/placeholderData";
+import PropTypes from "prop-types";
 
 const env = import.meta.env;
 
 const ProductImage = ({ img_link }) => {
-  const imgSrc = img_link ? useHandleImage(img_link) : null;
+  const imgSrc = useHandleImage(img_link);
   return (
     <img
-      className={`${!imgSrc ? "fade-animation" : ""}`}
+      className={`${imgSrc ? "" : "fade-animation"}`}
       src={imgSrc ?? Loading}
       alt="product-image"
       style={{ width: "100%" }}
@@ -34,6 +35,17 @@ export default function Product() {
   const dispatch = useDispatch();
   const cart = useSelector((state) => state?.cartReducer);
 
+  const getStarIconClassName = (num) => {
+    if (num <= product?.rating) return "bi-star-fill";
+    if (
+      num > product?.rating &&
+      Math.ceil(product?.rating) === num &&
+      (product?.rating * 10) % 10 >= 4
+    )
+      return "bi-star-half";
+    return "bi-star";
+  };
+
   // Load product
   useEffect(() => {
     const setReviewData = (data) => {
@@ -46,8 +58,8 @@ export default function Product() {
             (str) =>
               (review_content = review_content?.replace(
                 str,
-                `${str?.charAt(0)}||||${str?.charAt(2)}`
-              ))
+                `${str?.charAt(0)}||||${str?.charAt(2)}`,
+              )),
           );
         setReviews({
           reviewIds: data?.review_id?.split(","),
@@ -79,7 +91,7 @@ export default function Product() {
         .catch((err) => {
           if (env?.MODE === "production") {
             addDoc(collection(db, "errors"), {
-              [Date()]: {
+              [String(new Date())]: {
                 ...err,
                 moreDetails:
                   "File:product Line:64 function:getData (for product)",
@@ -118,15 +130,7 @@ export default function Product() {
                     <i
                       key={num}
                       style={{ color: "orange", fontSize: "16px" }}
-                      className={`bi ${
-                        num <= product?.rating
-                          ? "bi-star-fill"
-                          : num > product?.rating &&
-                            Math.ceil(product?.rating) === num &&
-                            (product?.rating * 10) % 10 >= 4
-                          ? "bi-star-half"
-                          : "bi-star"
-                      } `}
+                      className={`bi ${getStarIconClassName(num)} `}
                     ></i>
                   ))}
                 </span>
@@ -180,7 +184,9 @@ export default function Product() {
                 <span>Quantity</span>
                 <select
                   value={quantity}
-                  onChange={(e) => setQuantity(parseInt(e?.target?.value))}
+                  onChange={(e) =>
+                    setQuantity(Number.parseInt(e?.target?.value))
+                  }
                 >
                   {Array.from({ length: 20 }, (_, i) => i + 1).map((no) => (
                     <option key={no} value={no}>
@@ -226,3 +232,7 @@ export default function Product() {
     </>
   );
 }
+
+ProductImage.propTypes = {
+  img_link: PropTypes.string,
+};

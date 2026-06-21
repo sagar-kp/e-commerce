@@ -6,45 +6,42 @@ import { useHandleImage } from "../utils/custom hooks";
 import { auth } from "../utils/firebaseConfig";
 import { Loading } from "../assets/images";
 import Spinner from "./Spinner";
+import PropTypes from "prop-types";
 
 const Item = ({ productName, date }) => {
   const orders = useSelector(
-    (state) => state?.storeReducer?.userPurchase?.orders
+    (state) => state?.storeReducer?.userPurchase?.orders,
   );
-  const navigate = useNavigate();
   const imgSrc = useHandleImage(orders?.[date]?.[productName]?.img_link);
   return (
     <div style={{ display: "flex", margin: "0% 25% 0% 3%" }}>
-      <div
-        style={{ flex: "5%" }}
-        onClick={() => navigate(`/p?name=${productName}`)}
-      >
+      <Link style={{ flex: "5%" }} to={`/p?name=${productName}`}>
         <img
-          className={`${!imgSrc ? "fade-animation" : ""}`}
+          className={`${imgSrc ? "" : "fade-animation"}`}
           src={imgSrc ?? Loading}
-          alt="product image"
+          alt="product"
           style={{ width: "70%", cursor: "pointer" }}
         />
-      </div>
+      </Link>
       {orders?.[date]?.[productName]?.quantity > 0 && (
         <div className="orders__quantity">
           {orders?.[date]?.[productName]?.quantity}
         </div>
       )}
-      <div
+      <Link
         className="overflow-manager search__productname"
         style={{ flex: "75%", fontSize: "small" }}
-        onClick={() => navigate(`/p?name=${productName}`)}
+        to={`/p?name=${productName}`}
       >
         {productName}
-      </div>
+      </Link>
     </div>
   );
 };
 
 export default function Orders() {
   const orders = useSelector(
-    (state) => state?.storeReducer?.userPurchase?.orders
+    (state) => state?.storeReducer?.userPurchase?.orders,
   );
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -55,14 +52,15 @@ export default function Orders() {
       setLoading(false);
     }, 2000);
   }, []);
-  return loading ? (
-    <Spinner />
-  ) : orders && Object.keys(orders)?.length === 0 ? (
-    <section className="orders__no-orders">
-      No orders yet. <br />
-      <Link to="/">Start shopping</Link>
-    </section>
-  ) : (
+  if (loading) return <Spinner />;
+  if (orders && Object.keys(orders)?.length === 0)
+    return (
+      <section className="orders__no-orders">
+        No orders yet. <br />
+        <Link to="/">Start shopping</Link>
+      </section>
+    );
+  return (
     <section style={{ margin: "3% 15% 0%" }}>
       <p style={{ fontSize: "xx-large", marginBottom: "20px" }}>Your orders</p>
       {orders &&
@@ -80,11 +78,13 @@ export default function Orders() {
                 {Object.keys(orders?.[date])
                   ?.reduce((acc, productName) => {
                     const obj = orders?.[date]?.[productName];
-                    return (acc +=
+                    return (
+                      acc +
                       obj?.quantity *
-                      Number(
-                        obj?.discounted_price?.slice(1)?.replaceAll(",", "")
-                      ));
+                        Number(
+                          obj?.discounted_price?.slice(1)?.replaceAll(",", ""),
+                        )
+                    );
                   }, 0)
                   ?.toLocaleString()}
               </div>
@@ -93,7 +93,6 @@ export default function Orders() {
               Delivered {new Date(date)?.toDateString()?.slice(4)}
             </div>
             {Object.keys(orders?.[date])?.map((productName) => (
-              // Card component
               <Item key={productName} productName={productName} date={date} />
             ))}
           </div>
@@ -101,3 +100,8 @@ export default function Orders() {
     </section>
   );
 }
+
+Item.propTypes = {
+  productName: PropTypes.string.isRequired,
+  date: PropTypes.string.isRequired,
+};
