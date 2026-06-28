@@ -124,6 +124,13 @@ export default function Navbar() {
     }
     return 0;
   };
+  useEffect(() => {
+    const header = document.querySelector("header");
+    document.documentElement.style.setProperty(
+      "--header-height",
+      `${header.offsetHeight}px`,
+    );
+  }, []);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {

@@ -173,33 +173,35 @@ export default function Product() {
           )}
         </div>
         <div className="product__action">
-          <p className="product__action-price">{product?.discounted_price}</p>
-          {product?.product_name && (
-            <>
-              <p>
-                <span>Quantity</span>
-                <select
-                  value={quantity}
-                  onChange={(e) =>
-                    setQuantity(Number.parseInt(e?.target?.value))
-                  }
+          <div>
+            <p className="product__action-price">{product?.discounted_price}</p>
+            {product?.product_name && (
+              <>
+                <p>
+                  <span>Quantity</span>
+                  <select
+                    value={quantity}
+                    onChange={(e) =>
+                      setQuantity(Number.parseInt(e?.target?.value))
+                    }
+                  >
+                    {Array.from({ length: 20 }, (_, i) => i + 1).map((no) => (
+                      <option key={no} value={no}>
+                        {no}
+                      </option>
+                    ))}
+                  </select>
+                </p>
+                <button
+                  onClick={() => {
+                    dispatch(ADD_ITEM({ ...product, quantity }));
+                  }}
                 >
-                  {Array.from({ length: 20 }, (_, i) => i + 1).map((no) => (
-                    <option key={no} value={no}>
-                      {no}
-                    </option>
-                  ))}
-                </select>
-              </p>
-              <button
-                onClick={() => {
-                  dispatch(ADD_ITEM({ ...product, quantity }));
-                }}
-              >
-                Add to Cart
-              </button>
-            </>
-          )}
+                  Add to Cart
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </section>
       {Object.keys(reviews)?.length > 0 && (

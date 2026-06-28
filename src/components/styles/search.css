@@ -82,6 +82,7 @@
 
 .search__layout {
   display: flex;
+  margin-top: var(--header-height);
 }
 
 .search__filters {
@@ -95,6 +96,8 @@
 
 .search__no-results {
   padding: 30px 20% 0px;
+  margin-top: 15%;
+  margin-left: 10%;
 }
 
 .search__no-results-hint {

@@ -105,6 +105,7 @@
 .cart__page {
   display: flex;
   background: rgb(235, 236, 238);
+  margin-top: var(--header-height);
 }
 
 .cart__container {
