@@ -1,3 +1,16 @@
+header {
+  background-color: rgb(21, 21, 21);
+  display: flex;
+}
+header > nav:first-child {
+  flex: 10%;
+}
+header > nav:first-child > a > img {
+  width: 125px;
+  cursor: pointer;
+  margin: 9px 10px 0;
+}
+
 .navbar__input:focus {
   outline: 3.5px solid rgb(254, 190, 103) !important;
 }
@@ -22,6 +35,10 @@
   border-top-right-radius: 6px;
   border-bottom-right-radius: 6px;
   cursor: pointer;
+}
+
+.navbar__search-icon--focused {
+  outline: 3.5px solid rgb(254, 190, 103);
 }
 
 .navbar__search {
@@ -59,6 +76,11 @@
   font-weight: bold;
   cursor: pointer;
   text-decoration-line: none;
+  margin: 0px -27px 3px 0px;
+}
+
+.navbar__cart-number--many-items {
+  margin: 0px -31px 3px 0px;
 }
 
 .navbar__authenticate {
@@ -76,6 +98,21 @@
   padding: 20px 0px;
   width: 20%;
   z-index: 1;
+  right: 90px;
+}
+
+.navbar__hover--logged-in {
+  margin-top: 151px;
+}
+
+.navbar__hover--guest {
+  margin-top: 190px;
+}
+
+@media (min-width: 1200px) {
+  .navbar__hover {
+    right: 220px;
+  }
 }
 .navbar__hover > div > button {
   background-color: rgb(255, 216, 20);
@@ -112,6 +149,21 @@
 .navbar__returns-orders div:nth-child(2) {
   font-weight: bold;
   font-size: 14px;
+}
+
+.navbar__account-menu-signin {
+  text-align: center;
+}
+
+.navbar__account-menu-content {
+  padding-left: 15px;
+  color: white;
+}
+
+.navbar__account-menu-title {
+  font-size: 15px;
+  font-weight: bold;
+  color: white;
 }
 
 .navbar__new-customer {

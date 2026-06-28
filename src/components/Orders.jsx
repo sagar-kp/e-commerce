@@ -14,13 +14,12 @@ const Item = ({ productName, date }) => {
   );
   const imgSrc = useHandleImage(orders?.[date]?.[productName]?.img_link);
   return (
-    <div style={{ display: "flex", margin: "0% 25% 0% 3%" }}>
-      <Link style={{ flex: "5%" }} to={`/p?name=${productName}`}>
+    <div className="orders__item">
+      <Link className="orders__item-image-link" to={`/p?name=${productName}`}>
         <img
-          className={`${imgSrc ? "" : "fade-animation"}`}
+          className={`orders__item-image ${imgSrc ? "" : "fade-animation"}`}
           src={imgSrc ?? Loading}
           alt="product"
-          style={{ width: "70%", cursor: "pointer" }}
         />
       </Link>
       {orders?.[date]?.[productName]?.quantity > 0 && (
@@ -29,8 +28,7 @@ const Item = ({ productName, date }) => {
         </div>
       )}
       <Link
-        className="overflow-manager search__productname"
-        style={{ flex: "75%", fontSize: "small" }}
+        className="overflow-manager search__productname orders__item-name"
         to={`/p?name=${productName}`}
       >
         {productName}
@@ -43,8 +41,21 @@ export default function Orders() {
   const orders = useSelector(
     (state) => state?.storeReducer?.userPurchase?.orders,
   );
+  const orderKeys = orders ? Object.keys(orders) : [];
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const getTotal = (date) =>
+    Object.keys(orders?.[date])
+      ?.reduce((acc, productName) => {
+        const obj = orders?.[date]?.[productName];
+        return (
+          acc +
+          obj?.quantity *
+            Number(obj?.discounted_price?.slice(1)?.replaceAll(",", ""))
+        );
+      }, 0)
+      ?.toLocaleString();
+
   useEffect(() => {
     setLoading(true);
     setTimeout(() => {
@@ -53,7 +64,7 @@ export default function Orders() {
     }, 2000);
   }, []);
   if (loading) return <Spinner />;
-  if (orders && Object.keys(orders)?.length === 0)
+  if (orders && orderKeys?.length === 0)
     return (
       <section className="orders__no-orders">
         No orders yet. <br />
@@ -61,32 +72,20 @@ export default function Orders() {
       </section>
     );
   return (
-    <section style={{ margin: "3% 15% 0%" }}>
-      <p style={{ fontSize: "xx-large", marginBottom: "20px" }}>Your orders</p>
+    <section className="orders__page">
+      <h1 className="orders__page-title">Your orders</h1>
       {orders &&
-        Object.keys(orders)?.map((date) => (
+        orderKeys?.map((date) => (
           <div key={date} className="orders__container">
             <div className="orders__date-total">
-              <div style={{ flex: "5%" }}>
+              <div className="orders__meta">
                 ORDER PLACED
                 <br />
                 {new Date(date)?.toDateString()?.slice(4)}
               </div>
-              <div style={{ flex: "60%" }}>
+              <div className="orders__meta-total">
                 Total
-                <br />₹{" "}
-                {Object.keys(orders?.[date])
-                  ?.reduce((acc, productName) => {
-                    const obj = orders?.[date]?.[productName];
-                    return (
-                      acc +
-                      obj?.quantity *
-                        Number(
-                          obj?.discounted_price?.slice(1)?.replaceAll(",", ""),
-                        )
-                    );
-                  }, 0)
-                  ?.toLocaleString()}
+                <br />₹ {getTotal(date)}
               </div>
             </div>
             <div className="orders__delivery-date">

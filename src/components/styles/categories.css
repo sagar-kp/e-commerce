@@ -9,6 +9,14 @@
     rgba(227, 230, 230, 0.9),
     rgb(227, 230, 230)
   );
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (min-width: 1000px) {
+  .categories__section {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 .categories__card {
@@ -20,7 +28,16 @@
 }
 .categories__card img {
   cursor: pointer;
+  width: 99%;
 }
+.categories__card > h3 {
+  height: 55px;
+}
+.categories__card > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .categories__name {
   font-size: small;
   margin: -5px 0px 25px;
@@ -40,6 +57,7 @@
 
 .categories__overflow-manager {
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   display: -webkit-box;
   overflow: hidden;
@@ -49,4 +67,11 @@
 .categories__link {
   text-decoration-line: none;
   color: inherit;
+}
+
+.categories__card > div > .categories__link:nth-child(odd) {
+  margin: 0 5px 0 0;
+}
+.categories__card > div > .categories__link:nth-child(even) {
+  margin: 0 0 0 5px;
 }

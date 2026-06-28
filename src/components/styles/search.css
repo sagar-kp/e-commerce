@@ -26,6 +26,85 @@
   cursor: pointer;
 }
 
+.search__review-icon--selected,
+.search__price-option--selected,
+.search__category-option--selected {
+  font-weight: bold;
+}
+
+.search__clear-rating {
+  margin: -7px 0px 0px;
+}
+
+.search__left-icon {
+  transform: rotate(180deg);
+  pointer-events: none;
+}
+
+.search__star {
+  color: orange;
+  font-size: 16px;
+}
+
+.search__star--large {
+  font-size: 18px;
+}
+
+.search__card-image-wrapper {
+  flex: 25%;
+}
+
+.search__card-details {
+  padding-left: 10px;
+  flex: 75%;
+}
+
+.search__price-row {
+  margin-top: -15px;
+}
+
+.search__discounted-price {
+  font-size: 28px;
+}
+
+.search__mrp {
+  font-size: 14px;
+  padding-left: 8px;
+}
+
+.search__mrp-strikethrough {
+  text-decoration-line: line-through;
+}
+
+.search__discount-off {
+  margin-left: 8px;
+}
+
+.search__layout {
+  display: flex;
+}
+
+.search__filters {
+  flex: 20%;
+  padding-left: 10px;
+}
+
+.search__results-panel {
+  flex: 80%;
+}
+
+.search__no-results {
+  padding: 30px 20% 0px;
+}
+
+.search__no-results-hint {
+  font-size: small;
+}
+
+.price__input--max {
+  margin-left: 3px;
+}
+
 /* SearchCard */
 
 .search__rating-count {
@@ -37,6 +116,7 @@
   text-decoration-line: none;
   color: inherit;
   cursor: pointer;
+  line-clamp: 2;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   display: -webkit-box;
@@ -76,4 +156,8 @@
 }
 .price__button:hover {
   background-color: rgba(211, 211, 211, 0.171);
+}
+
+.search__price-controls {
+  display: flex;
 }

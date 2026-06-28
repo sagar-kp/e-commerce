@@ -6,11 +6,8 @@ export default function useCarouselUtils(carouselData) {
   const getHtmlElements = () => {
     const track = document.querySelector(".carousel__track");
     const slides = Array.from(track?.children);
-    const nav = document.querySelector(".carousel__nav");
-    const navDots = Array.from(nav?.children);
     const currentSlide = track?.querySelector(".current-slide");
-    const currentNavDot = nav?.querySelector(".current-slide");
-    return [track, slides, navDots, currentSlide, currentNavDot];
+    return [track, slides, currentSlide];
   };
 
   // Adds/ Removes classname to/from an HTML element
@@ -23,24 +20,10 @@ export default function useCarouselUtils(carouselData) {
     addList?.forEach((element) => element?.classList?.add(className_));
   };
 
-  // Performs necessary slide change after dots are clicked
-  const handleDotsClick = (index) => {
-    if (carouselData?.length > 1) {
-      const [track, slides, navDots, currentSlide, currentNavDot] =
-        getHtmlElements();
-      addRemoveClasslist(
-        [currentSlide, currentNavDot],
-        [slides[index], navDots[index]],
-      );
-      track.style.transform = `translate(-${slides[index].style.left})`;
-    }
-  };
-
   // Performs necessary slide change on accepting the direction
   const changeSlide = (buttonSide = "right") => {
     if (carouselData?.length > 1) {
-      const [track, slides, navDots, currentSlide, currentNavDot] =
-        getHtmlElements();
+      const [track, slides, currentSlide] = getHtmlElements();
       const getNextSlide = () => {
         if (buttonSide === "left") {
           if (currentSlide?.previousElementSibling)
@@ -50,25 +33,12 @@ export default function useCarouselUtils(carouselData) {
           return currentSlide.nextElementSibling;
         return slides?.[0];
       };
-      const getNextNavDot = () => {
-        if (buttonSide === "left") {
-          if (currentNavDot.previousElementSibling)
-            return currentNavDot?.previousElementSibling;
-          return navDots?.[navDots?.length - 1];
-        }
-        if (currentNavDot?.nextElementSibling)
-          return currentNavDot.nextElementSibling;
-        return navDots?.[0];
-      };
+
       const nextSlide = getNextSlide();
-      // const currentNavDot = nav.querySelector(".current-slide")
-      const nextNavDot = getNextNavDot();
+
       const amountToMove = nextSlide?.style?.left;
       track.style.transform = `translate(-${amountToMove})`;
-      addRemoveClasslist(
-        [currentSlide, currentNavDot],
-        [nextSlide, nextNavDot],
-      );
+      addRemoveClasslist([currentSlide], [nextSlide]);
     }
   };
 
@@ -95,5 +65,5 @@ export default function useCarouselUtils(carouselData) {
     }
   }, [carouselData]);
 
-  return [handleClick, handleDotsClick];
+  return [handleClick];
 }

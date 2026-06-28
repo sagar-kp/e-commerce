@@ -121,18 +121,16 @@ export default function SignInUp() {
     <div className="signinup__container">
       <section>
         <Link to="/">
-          <img
-            src={logo2}
-            alt="logo"
-            style={{ margin: "2% 0%", cursor: "pointer" }}
-          />
+          <img src={logo2} alt="logo" className="signinup__logo" />
         </Link>
         <form onSubmit={handleSubmit}>
           <p>Sign {pathname === "/signin" ? "in" : "up"}</p>
 
           {invalidCred && (
             <>
-              <span style={{ fontSize: "15px" }}>Invalid Credentials</span>
+              <span className="signinup__invalid-cred">
+                Invalid Credentials
+              </span>
               <br />
             </>
           )}

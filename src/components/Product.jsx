@@ -17,10 +17,9 @@ const ProductImage = ({ img_link }) => {
   const imgSrc = useHandleImage(img_link);
   return (
     <img
-      className={`${imgSrc ? "" : "fade-animation"}`}
+      className={`product__image ${imgSrc ? "" : "fade-animation"}`}
       src={imgSrc ?? Loading}
       alt="product-image"
-      style={{ width: "100%" }}
     />
   );
 };
@@ -106,8 +105,8 @@ export default function Product() {
     <div className="product__error">Some error occurred</div>
   ) : (
     <>
-      <section style={{ display: "flex", marginTop: "3%" }}>
-        <div style={{ flex: "46%", margin: "0% 0% 0% 1.5%" }}>
+      <section className="product__section">
+        <div className="product__image-wrapper">
           <ProductImage img_link={product?.img_link} />
         </div>
         <div className="product__details">
@@ -129,8 +128,7 @@ export default function Product() {
                   {[1, 2, 3, 4, 5].map((num) => (
                     <i
                       key={num}
-                      style={{ color: "orange", fontSize: "16px" }}
-                      className={`bi ${getStarIconClassName(num)} `}
+                      className={`product__star bi ${getStarIconClassName(num)} `}
                     ></i>
                   ))}
                 </span>
@@ -142,16 +140,16 @@ export default function Product() {
           )}
           {product?.actual_price && (
             <p>
-              <span style={{ color: "rgb(204, 12, 57)", fontSize: "24px" }}>
+              <span className="product__discount">
                 -{product?.discount_percentage}
               </span>{" "}
-              <span style={{ fontSize: "26px" }}>
+              <span className="product__price">
                 {product?.discounted_price}
               </span>
               <br />
-              <span style={{ fontSize: "11px", color: "gray" }}>
+              <span className="product__mrp">
                 M.R.P.:{" "}
-                <span style={{ textDecorationLine: "line-through" }}>
+                <span className="product__mrp-strikethrough">
                   {product?.actual_price}
                 </span>
               </span>
@@ -160,9 +158,9 @@ export default function Product() {
           {product?.about_product ? (
             <>
               <b>About this item</b>
-              <ul style={{ fontSize: "15px" }}>
+              <ul className="product__about-list">
                 {product?.about_product?.split("|")?.map((str) => (
-                  <li style={{ marginLeft: "-17px" }} key={str}>
+                  <li className="product__about-item" key={str}>
                     {str}
                   </li>
                 ))}
@@ -175,9 +173,7 @@ export default function Product() {
           )}
         </div>
         <div className="product__action">
-          <p style={{ fontSize: "26px", marginTop: "10px" }}>
-            {product?.discounted_price}
-          </p>
+          <p className="product__action-price">{product?.discounted_price}</p>
           {product?.product_name && (
             <>
               <p>
@@ -207,22 +203,22 @@ export default function Product() {
         </div>
       </section>
       {Object.keys(reviews)?.length > 0 && (
-        <section style={{ margin: "2% 2% 2% 32%" }}>
-          <p style={{ fontSize: "18px", fontWeight: "bold" }}>Top reviews</p>
+        <section className="product__reviews">
+          <p className="product__reviews-title">Top reviews</p>
           {reviews?.reviewIds?.map((id, index) => (
-            <div key={id} style={{ marginTop: "25px" }}>
-              <p style={{ fontSize: "small" }}>
+            <div key={id} className="product__review-item">
+              <p className="product__review-user">
                 <img
-                  style={{ margin: "0 10px -10px 0px", width: "30px" }}
+                  className="product__review-user-image"
                   src={userImg}
                   alt="user-image"
                 />
                 {reviews?.userNames?.[index]}
               </p>
-              <p style={{ fontSize: "15px", fontWeight: "bold" }}>
+              <p className="product__review-title">
                 {reviews?.reviewTitles?.[index]}
               </p>
-              <p style={{ fontSize: "15px", marginTop: "-17px" }}>
+              <p className="product__review-content">
                 {reviews?.reviewContents?.[index]}
               </p>
             </div>

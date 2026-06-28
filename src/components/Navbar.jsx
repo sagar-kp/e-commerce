@@ -23,6 +23,12 @@ export default function Navbar() {
   const { pathname, search } = location;
   const windowDimensions = useWindowDimensions();
 
+  const itemsInCart = Object.keys(cart)?.reduce(
+    (sum, key) => sum + cart?.[key]?.quantity,
+    0,
+  );
+  const isQuantityGreaterThanNine = itemsInCart > 9;
+
   const redirectApropriately = (link) => {
     if (auth?.currentUser) navigate(link);
     else {
@@ -79,7 +85,7 @@ export default function Navbar() {
     return auth?.currentUser?.email;
   };
 
-  const performUserLogin = () => {
+  const performUserLogin = (user) => {
     getDoc(doc(db, "users", user?.uid))
       .then((resp) => {
         const data = resp?.data();
@@ -114,11 +120,7 @@ export default function Navbar() {
 
   const getItemsInCart = () => {
     if (Object.keys(cart)?.length > 0) {
-      const itemsInCart = Object.keys(cart)?.reduce(
-        (sum, key) => sum + cart?.[key]?.quantity,
-        0,
-      );
-      return itemsInCart > 9 ? "9+" : itemsInCart;
+      return isQuantityGreaterThanNine ? "9+" : itemsInCart;
     }
     return 0;
   };
@@ -133,7 +135,7 @@ export default function Navbar() {
           }),
         );
       else if (user) {
-        performUserLogin();
+        performUserLogin(user);
       }
     });
   }, []);
@@ -158,18 +160,10 @@ export default function Navbar() {
   return pathname === "/signin" || pathname === "/signup" ? (
     <></>
   ) : (
-    <header style={{ backgroundColor: "rgb(21, 21, 21)", display: "flex" }}>
-      <nav style={{ flex: "10%" }}>
+    <header>
+      <nav>
         <Link to="/">
-          <img
-            src={logo}
-            alt="logo"
-            style={{
-              width: "125px",
-              margin: "9px 10px 0px",
-              cursor: "pointer",
-            }}
-          />
+          <img src={logo} alt="logo" />
         </Link>
       </nav>
 
@@ -183,8 +177,7 @@ export default function Navbar() {
           onChange={(e) => setInputValue(e?.target?.value)}
         />
         <button
-          className="navbar__search-icon"
-          style={{ outline: ipFocus && "3.5px solid rgb(254, 190, 103)" }}
+          className={`navbar__search-icon ${ipFocus ? "navbar__search-icon--focused" : ""}`}
           onClick={() => {
             if (inputValue?.length > 0) navigate(`/s?k=${inputValue}`);
           }}
@@ -212,16 +205,12 @@ export default function Navbar() {
             onFocus={() => setAccountsHover(true)}
             onBlur={() => setAccountsHover(false)}
             onMouseOut={() => setAccountsHover(false)}
-            className="navbar__hover"
+            className={`navbar__hover ${auth?.currentUser ? "navbar__hover--logged-in" : "navbar__hover--guest"}`}
             role="menu"
             tabIndex={0}
-            style={{
-              marginTop: auth?.currentUser ? "151px" : "190px",
-              right: windowDimensions?.windowWidth > 1200 ? "220px" : "90",
-            }}
           >
             {!auth?.currentUser && (
-              <div style={{ textAlign: "center" }}>
+              <div className="navbar__account-menu-signin">
                 <button onClick={() => signInUpTasks("/signin")}>
                   Sign in
                 </button>
@@ -242,21 +231,8 @@ export default function Navbar() {
               role="menu"
               tabIndex={0}
             >
-              <div
-                style={{
-                  paddingLeft: "15px",
-                  color: "white",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: "15px",
-                    fontWeight: "bold",
-                    color: "white",
-                  }}
-                >
-                  Your account
-                </div>
+              <div className="navbar__account-menu-content">
+                <div className="navbar__account-menu-title">Your account</div>
                 <button
                   className="navbar__your-orders"
                   onClick={() => redirectApropriately("/orders")}
@@ -287,18 +263,8 @@ export default function Navbar() {
       </nav>
       <nav className="navbar__cart">
         <Link
-          className="navbar__cart-number"
+          className={`navbar__cart-number ${isQuantityGreaterThanNine ? "navbar__cart-number--many-items" : ""}`}
           to="/cart"
-          style={{
-            margin: `0px ${
-              Object.keys(cart)?.reduce(
-                (sum, key) => sum + cart?.[key]?.quantity,
-                0,
-              ) > 9
-                ? "-31px"
-                : "-27px"
-            } 3px 0px`,
-          }}
         >
           {getItemsInCart()}
         </Link>
