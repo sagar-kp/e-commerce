@@ -78,12 +78,12 @@ export default function Navbar() {
       });
   };
 
-  const getDisplayableValue = () => {
-    if (!auth?.currentUser) return "sign in";
-    if (auth?.currentUser?.displayName?.length > 0)
-      return auth?.currentUser?.displayName;
-    return auth?.currentUser?.email;
-  };
+  let displayableValue;
+  const currentUser = auth?.currentUser;
+  if (!currentUser) displayableValue = "sign in";
+  else if (currentUser?.displayName?.length > 0)
+    displayableValue = currentUser?.displayName;
+  else displayableValue = currentUser?.email;
 
   const performUserLogin = (user) => {
     getDoc(doc(db, "users", user?.uid))
@@ -200,7 +200,7 @@ export default function Navbar() {
           onMouseOut={() => setAccountsHover(false)}
           onBlur={() => setAccountsHover(false)}
         >
-          <div>Hello, {getDisplayableValue()}</div>
+          <div>Hello, {displayableValue}</div>
           <div>
             <span>Accounts & Lists</span>
             <i className="bi bi-caret-down-fill"></i>
