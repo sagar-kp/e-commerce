@@ -15,62 +15,58 @@ import { useHandleImage } from "../utils/custom hooks";
 import PropTypes from "prop-types";
 
 const env = import.meta.env;
+const arrayOfLengthTwenty = Array.from({ length: 20 }, (_, i) => i + 1);
 
 const Item = ({ item }) => {
   const dispatch = useDispatch();
   const cart = useSelector((state) => state?.cartReducer);
-  const imgSrc = useHandleImage(cart?.[item]?.img_link);
+  const cartItem = cart?.[item];
+  const imgSrc = useHandleImage(cartItem?.img_link);
 
   return (
     <div className="cart__container">
-      <div style={{ flex: "20%" }}>
+      <div className="cart__image-wrapper">
         <img
           className={`${imgSrc ? "" : "fade-animation"}`}
           src={imgSrc ?? Loading}
           alt="product-image"
         />
       </div>
-      <div style={{ flex: "58%", paddingLeft: "2%" }}>
+      <div className="cart__details">
         <Link
-          style={{ fontSize: "20px" }}
-          className="search__productname"
-          to={`/p?name=${cart?.[item]?.product_name}`}
+          className="search__productname cart__product-name"
+          to={`/p?name=${cartItem?.product_name}`}
         >
-          {cart?.[item]?.product_name}
+          {cartItem?.product_name}
         </Link>
-        <div
-          style={{ marginTop: "10px", fontWeight: "bold", fontSize: "19px" }}
-        >
-          {cart?.[item]?.discounted_price}
-        </div>
+        <div className="cart__price">{cartItem?.discounted_price}</div>
         <div className="cart__modify">
           <div className="cart__select-div">
             <span>Qty:</span>
             <select
-              value={cart?.[item]?.quantity}
+              value={cartItem?.quantity}
               onChange={(e) => {
                 //modify in cloud db
                 dispatch(
                   ADD_ITEM({
-                    ...cart?.[item],
+                    ...cartItem,
                     quantity: Number.parseInt(e?.target?.value),
                   }),
                 );
               }}
             >
-              {Array.from({ length: 20 }, (_, i) => i + 1)?.map((no) => (
+              {arrayOfLengthTwenty?.map((no) => (
                 <option key={no} value={no}>
                   {no}
                 </option>
               ))}
             </select>
           </div>
-          <span style={{ margin: "0px 10px" }}>|</span>
+          <span className="cart__divider">|</span>
           <button
             className="cart__delete"
             onClick={() => {
-              //modify in cloud db
-              dispatch(REMOVE_ITEM(cart?.[item]?.product_name));
+              dispatch(REMOVE_ITEM(cartItem?.product_name));
             }}
           >
             Delete
@@ -83,6 +79,23 @@ const Item = ({ item }) => {
 
 export default function Cart() {
   const cart = useSelector((state) => state?.cartReducer);
+  const cartKeys = Object.keys(cart);
+  const doesCartHaveItems = cartKeys?.length > 0;
+  const cartQuantity = cartKeys?.reduce(
+    (sum, key) => sum + cart?.[key]?.quantity,
+    0,
+  );
+  const cartPrice = cartKeys
+    ?.reduce(
+      (sum, key) =>
+        sum +
+        Number.parseFloat(
+          cart?.[key]?.discounted_price?.replaceAll(",", "")?.replace("₹", ""),
+        ) *
+          cart?.[key]?.quantity,
+      0,
+    )
+    ?.toLocaleString();
   const userPurchase = useSelector(
     (state) => state?.storeReducer?.userPurchase,
   );
@@ -139,7 +152,7 @@ export default function Cart() {
     return (
       <p className="cart__checkout">
         <div>Thank you for shopping with us</div>
-        <Link to="/orders" style={{ textDecorationLine: "none" }}>
+        <Link to="/orders" className="cart__checkout-link">
           Go to your orders
         </Link>
       </p>
@@ -153,17 +166,15 @@ export default function Cart() {
       </div>
     ) : (
       <div className="cart__empty">
-        <div style={{ flex: "30%" }}>
+        <div className="cart__empty-image">
           <img src={emptyCart} alt="empty-cart" />
         </div>
-        <div style={{ flex: "66%", marginLeft: "4%" }}>
-          <div style={{ fontSize: "22px", fontWeight: "bold" }}>
-            Your Amazing Cart is empty
-          </div>
+        <div className="cart__empty-content">
+          <div className="cart__empty-title">Your Amazing Cart is empty</div>
           <Link className="cart__deals" to="/">
             Shop today's deals
           </Link>
-          <div style={{ display: "flex", marginTop: "15px" }}>
+          <div className="cart__empty-actions">
             <Link to="/signin" className="cart__signinup cart__signin">
               Sign in to your account
             </Link>
@@ -176,48 +187,23 @@ export default function Cart() {
     );
   };
   return (
-    <div style={{ display: "flex", background: "rgb(235, 236, 238" }}>
+    <div className="cart__page">
       <div className="cart__main">
-        {Object.keys(cart)?.length > 0 && (
+        {doesCartHaveItems && (
           <div className="cart__heading">Shopping Cart</div>
         )}
-        {Object.keys(cart)?.length > 0
-          ? Object.keys(cart)?.map((key) => <Item item={key} key={key} />)
+        {doesCartHaveItems
+          ? cartKeys.map((key) => <Item item={key} key={key} />)
           : getEmptyCartBasedOnSignedStatus()}
       </div>
       <div
-        className="cart__purchase"
-        style={{
-          backgroundColor: `${
-            Object.keys(cart)?.length > 0 ? "white" : "transparent"
-          }`,
-        }}
+        className={`cart__purchase ${doesCartHaveItems ? "cart__purchase--filled" : ""}`}
       >
-        {Object.keys(cart)?.length > 0 && (
+        {doesCartHaveItems && (
           <>
-            <div style={{ fontSize: "20px", marginTop: "20px" }}>
-              Subtotal (
-              {Object.keys(cart)?.reduce(
-                (sum, key) => sum + cart?.[key]?.quantity,
-                0,
-              )}{" "}
-              items):
-              <span style={{ fontWeight: "bold" }}>
-                ₹{" "}
-                {Object.keys(cart)
-                  ?.reduce(
-                    (sum, key) =>
-                      sum +
-                      Number.parseFloat(
-                        cart?.[key]?.discounted_price
-                          ?.replaceAll(",", "")
-                          ?.replace("₹", ""),
-                      ) *
-                        cart?.[key]?.quantity,
-                    0,
-                  )
-                  ?.toLocaleString()}
-              </span>
+            <div className="cart__subtotal">
+              Subtotal ({cartQuantity} items):
+              <span className="cart__subtotal-value">₹ {cartPrice}</span>
             </div>
             <button className="cart__buy" onClick={handleBuyClick}>
               Proceed to Buy

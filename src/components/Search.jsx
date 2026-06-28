@@ -14,7 +14,7 @@ const priceArr = [0, 1000, 5000, 10000, 20000, 20000];
 
 const LeftIcon = () => (
   <svg
-    style={{ transform: "rotate(180deg)", pointerEvents: "none" }}
+    className="search__left-icon"
     fill="#000000"
     height="11px"
     width="11px"
@@ -54,14 +54,14 @@ const SearchCard = ({ obj }) => {
   };
   return (
     <div className="search__card-container">
-      <div style={{ flex: "25%" }}>
+      <div className="search__card-image-wrapper">
         <img
           className={`${imgSrc ? "" : "fade-animation"}`}
           src={imgSrc ?? Loading}
           alt="product_image"
         />
       </div>
-      <div style={{ paddingLeft: "10px", flex: "75%" }}>
+      <div className="search__card-details">
         <Link
           className="search__productname mt-15"
           to={`/p?name=${obj?.product_name}`}
@@ -73,27 +73,23 @@ const SearchCard = ({ obj }) => {
             {[1, 2, 3, 4, 5].map((num) => (
               <i
                 key={num}
-                style={{ color: "orange", fontSize: "16px" }}
-                className={`bi ${getStarIconClass(num)} `}
+                className={`search__star bi ${getStarIconClass(num)} `}
               ></i>
             ))}
           </span>
-          <span
-            className="search__rating-count"
-            style={{ color: "#004e93", fontSize: "15px", marginLeft: "5px" }}
-          >
-            {obj?.rating_count}
-          </span>
+          <span className="search__rating-count">{obj?.rating_count}</span>
         </p>
-        <p style={{ marginTop: "-15px" }}>
-          <span style={{ fontSize: "28px" }}>{obj?.discounted_price}</span>
-          <span style={{ fontSize: "14px", paddingLeft: "8px" }}>
+        <p className="search__price-row">
+          <span className="search__discounted-price">
+            {obj?.discounted_price}
+          </span>
+          <span className="search__mrp">
             M.R.P:{" "}
-            <span style={{ textDecorationLine: "line-through" }}>
+            <span className="search__mrp-strikethrough">
               {obj?.actual_price}
             </span>
           </span>
-          <span style={{ marginLeft: "8px" }}>
+          <span className="search__discount-off">
             ({obj?.discount_percentage} off)
           </span>
         </p>
@@ -134,11 +130,8 @@ const PriceComp = ({ selected, setSelected }) => {
       )}
       {priceArr?.slice(1)?.map((price, index) => (
         <button
-          className="button-options"
+          className={`button-options ${priceArr[index] === selected?.price?.min ? "search__price-option--selected" : ""}`}
           key={price}
-          style={{
-            fontWeight: priceArr[index] === selected?.price?.min && "bold",
-          }}
           onClick={() => filterPrice(index, price)}
         >
           {`
@@ -151,7 +144,7 @@ const PriceComp = ({ selected, setSelected }) => {
         `}
         </button>
       ))}
-      <div style={{ display: "flex" }}>
+      <div className="search__price-controls">
         <input
           className="price__input"
           value={inputPrice?.min >= 0 && inputPrice?.min}
@@ -161,13 +154,12 @@ const PriceComp = ({ selected, setSelected }) => {
           onChange={handleChange}
         />
         <input
-          className="price__input"
+          className="price__input price__input--max"
           value={inputPrice?.max >= 0 && inputPrice?.max}
           placeholder="Max"
           type="number"
           name="max"
           onChange={handleChange}
-          style={{ marginLeft: "3px" }}
         />
         <button
           className="price__button"
@@ -267,13 +259,13 @@ export default function Search() {
 
   if (noResult || loading)
     return noResult ? (
-      <div style={{ padding: "30px 20% 0px" }}>
+      <div className="search__no-results">
         No results for{" "}
         {categoriesQuery
           ? categoriesQuery?.replaceAll(" | ", " or ")
           : query?.replaceAll(" | ", " or ")}
         <br />
-        <span style={{ fontSize: "small" }}>
+        <span className="search__no-results-hint">
           Try checking your spelling or use more general terms
         </span>
       </div>
@@ -281,15 +273,14 @@ export default function Search() {
       <Spinner />
     );
   return (
-    <div style={{ display: "flex" }}>
-      <div style={{ flex: "20%", paddingLeft: "10px" }}>
+    <div className="search__layout">
+      <div className="search__filters">
         {searchResults?.length > 0 && (
           <>
             <p className="title">Customer Review</p>
             {selected?.rating !== -1 && (
               <button
-                className="button-options"
-                style={{ margin: "-7px 0px 0px" }}
+                className="button-options search__clear-rating"
                 onClick={() => setSelected((prev) => ({ ...prev, rating: -1 }))}
               >
                 <LeftIcon />
@@ -299,15 +290,13 @@ export default function Search() {
             {[4, 3, 2, 1].map((no) => (
               <button
                 key={no}
-                className="search__review-icon"
-                style={{ fontWeight: selected.rating === no && "bold" }}
+                className={`search__review-icon ${selected.rating === no ? "search__review-icon--selected" : ""}`}
                 onClick={() => setSelected((prev) => ({ ...prev, rating: no }))}
               >
                 {[1, 2, 3, 4, 5].map((num) => (
                   <i
                     key={num}
-                    style={{ color: "orange", fontSize: "18px" }}
-                    className={`bi ${num <= no ? "bi-star-fill" : "bi-star"} `}
+                    className={`search__star search__star--large bi ${num <= no ? "bi-star-fill" : "bi-star"} `}
                   ></i>
                 ))}{" "}
                 & Up
@@ -330,16 +319,15 @@ export default function Search() {
         )}
         {categories?.map((obj) => (
           <button
-            className="button-options"
+            className={`button-options ${obj === selected?.category ? "search__category-option--selected" : ""}`}
             key={obj}
-            style={{ fontWeight: obj === selected?.category && "bold" }}
             onClick={() => setSelected((prev) => ({ ...prev, category: obj }))}
           >
             {obj}
           </button>
         ))}
       </div>
-      <div style={{ flex: "80%" }}>
+      <div className="search__results-panel">
         {searchResults?.length > 0 && <h3>Results</h3>}
         {displayData?.map((obj) => (
           <SearchCard key={obj?.productId} obj={obj} />

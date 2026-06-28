@@ -1,25 +1,17 @@
-import "./styles/categories.css";
 import Carousel from "./Carousel";
 import Categories from "./Categories";
-import { useInitialFetch, useWindowDimensions } from "../utils/custom hooks";
+import { useInitialFetch } from "../utils/custom hooks";
 import { placeholderCategoriesData } from "../utils/placeholderData";
+import "./styles/categories.css";
+import "./styles/common.css";
 
 export default function Home() {
   const { data } = useInitialFetch("categoriesData", "categories");
   const categoriesData = data?.length ? data : placeholderCategoriesData;
-  const windowDimensions = useWindowDimensions();
   return (
-    <div style={{ width: "100%" }}>
+    <div className="full-width">
       <Carousel />
-      <section
-        className="categories__section"
-        style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${
-            windowDimensions?.windowWidth > 1000 ? 4 : 3
-          }, minmax(0, 1fr))`,
-        }}
-      >
+      <section className="categories__section">
         {categoriesData?.map((obj, index) => (
           <Categories key={obj?.offer?.length ? obj.offer : index} obj={obj} />
         ))}

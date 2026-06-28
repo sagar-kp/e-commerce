@@ -50,6 +50,14 @@
   top: 0;
 }
 
+.carousel__arrow {
+  pointer-events: none;
+}
+
+.carousel__arrow--left {
+  transform: rotate(180deg);
+}
+
 .carousel__nav {
   display: flex;
   justify-content: center;

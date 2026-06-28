@@ -41,7 +41,7 @@ form p {
 .signinup__create-account span {
   background-color: white;
   padding: 5px;
-  color: grey;
+  color: rgb(95, 95, 95);
 }
 .signinup__create-account button {
   width: 100%;
@@ -63,4 +63,13 @@ form p {
 }
 .signinup__container section img {
   width: 45%;
+}
+
+.signinup__logo {
+  margin: 2% 0%;
+  cursor: pointer;
+}
+
+.signinup__invalid-cred {
+  font-size: 15px;
 }

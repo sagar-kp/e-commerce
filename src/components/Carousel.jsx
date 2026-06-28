@@ -22,7 +22,7 @@ const CarouselImage = ({ src, alt }) => {
 
 const arrow = (left = false) => (
   <svg
-    style={{ transform: left && "rotate(180deg)", pointerEvents: "none" }}
+    className={`carousel__arrow ${left ? "carousel__arrow--left" : ""}`}
     fill="#000000"
     height="40px"
     width="40px"
@@ -51,7 +51,7 @@ const arrow = (left = false) => (
 export default function Carousel() {
   const { data } = useInitialFetch("carouselData", "carousel");
   const carouselData = data?.length ? data : placeholderCarouselData;
-  const [handleClick, handleDotsClick] = useCarouselUtils(carouselData);
+  const [handleClick] = useCarouselUtils(carouselData);
 
   return (
     <section>
@@ -90,18 +90,6 @@ export default function Carousel() {
         >
           {arrow()}
         </button>
-
-        <div className="carousel__nav" style={{ display: "none" }}>
-          {carouselData?.map((obj, index) => (
-            <button
-              key={obj?.keywords?.join("+%7C+")}
-              className={`carousel__indicator ${
-                index === 0 ? "current-slide" : ""
-              }`}
-              onClick={() => handleDotsClick(index)}
-            ></button>
-          ))}
-        </div>
       </div>
     </section>
   );

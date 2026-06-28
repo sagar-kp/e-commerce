@@ -11,7 +11,6 @@ const CategoryImage = ({ src, alt }) => {
       className={`${imgSrc ? "" : "fade-animation"}`}
       src={imgSrc ?? LoadingCategory}
       alt={alt ?? "image category"}
-      style={{ width: "99%" }}
     />
   );
 };
@@ -34,31 +33,14 @@ export default function Categories({ obj }) {
   };
   return (
     <div className="categories__card">
-      <h3 style={{ height: "55px" }} className="overflow-manager">
-        {obj?.offer}
-      </h3>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(2, minmax(0, 1fr))", //`${"auto ".repeat(2)}`
-        }}
-      >
+      <h3 className="overflow-manager">{obj?.offer}</h3>
+      <div>
         {[1, 2, 3, 4].map((imgNo) => (
-          <Link
-            key={imgNo}
-            className="categories__link"
-            style={{
-              margin: `0px ${imgNo % 2 === 0 ? "0px" : "5px"} 0px ${
-                imgNo % 2 === 0 ? "5px" : "0px"
-              }`,
-            }}
-            to={getLink(imgNo)}
-          >
+          <Link key={imgNo} className="categories__link" to={getLink(imgNo)}>
             <CategoryImage
               src={obj?.[`img${imgNo}`]?.[0]}
               alt={obj?.[`img${imgNo}`]?.[1]}
             />
-
             <div className="categories__name overflow-manager">
               {obj?.[`img${imgNo}`]?.[1]}
             </div>
